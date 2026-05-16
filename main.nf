@@ -44,4 +44,7 @@ workflow {
         }
     
     FASTP(input_ch)
+
+    // profile samples with sylph
+    // map to reference with bwa
 }
