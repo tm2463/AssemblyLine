@@ -1,4 +1,5 @@
 process FASTP {
+    // https://github.com/opengene/fastp
     cpus 8
     memory 8.GB
 
@@ -16,4 +17,20 @@ process FASTP {
     """
     fastp --thread ${task.cpus} --in1 ${R1} --in2 ${R2} --out1 ${out1} --out2 ${out2} -j ${ID}.json
     """
+}
+
+process SYLPH {
+    // https://github.com/bluenote-1577/sylph
+    cpus 8
+    memory 8.GB
+
+    container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
+}
+
+process BWA {
+    // https://github.com/bwa-mem2/bwa-mem2
+    cpus 8
+    memory 8.GB
+
+    container "quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0"
 }
