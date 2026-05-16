@@ -19,7 +19,9 @@ Example:
 """
 }
 
-include { FASTP } from './modules/fastp.nf'
+include { FASTP 
+          SYLPH 
+          BWA } from './modules/preprocessing.nf'
 
 workflow {
 
