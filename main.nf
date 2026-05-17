@@ -14,11 +14,15 @@ Optional:
 fastp:
     --min_depth                         Default: 30
     --lower_assembly_length             Default: 5500000
+
+sylph:
+    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
 """
 }
 
 include { FASTP 
-          FILTER_FASTP } from './modules/preprocessing.nf'
+          FILTER_FASTP 
+          SYLPH } from './modules/preprocessing.nf'
 
 workflow {
 
@@ -44,6 +48,12 @@ workflow {
     
     FASTP(input_ch)
     | FILTER_FASTP
+    | filter { ID, R1, R2, fastp_out -> fastp_out.trim() == 'PASS' }
+    | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
+    | SYLPH
+
+
+    
 
     // profile samples with sylph
     // map to reference with bwa

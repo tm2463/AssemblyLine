@@ -34,7 +34,7 @@ process FILTER_FASTP {
     tuple val(ID), path(R1), path(R2), path(fastp_json)
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout, emit: filter_ch
+    tuple val(ID), path(R1), path(R2), stdout, emit: fastp_out
 
     script:
     def command="${projectDir}/bin/pass_fail_fastp.py"
@@ -43,13 +43,26 @@ process FILTER_FASTP {
     """
 }
 
-// process SYLPH {
-//     // https://github.com/bluenote-1577/sylph
-//     cpus 8
-//     memory 8.GB
+process SYLPH {
+    // https://github.com/bluenote-1577/sylph
+    cpus 8
+    memory 8.GB
 
-//     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
-// }
+    container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
+
+    publishDir "${params.outdir}/sylph", mode: 'copy', pattern: '*_sylph_profile.tsv'
+
+    input:
+    tuple val(ID), path(R1), path(R2)
+
+    output:
+    tuple val(ID), path(R1), path(R2), path("${ID}_sylph_profile.tsv")
+
+    script:
+    """
+    sylph profile ${params.sylph_db}--threads ${task.cpus} -1 ${R1} -2 ${R2} > ${ID}_sylph_profile.tsv
+    """
+}
 
 // process BWA {
 //     // https://github.com/bwa-mem2/bwa-mem2

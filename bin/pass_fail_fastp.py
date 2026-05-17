@@ -14,6 +14,6 @@ with open(fastp_out) as f:
 val = fastp["summary"]["after_filtering"]["total_bases"]
 
 if val >= min_depth * lower_assembly_length:
-    print("pass")
+    print('PASS')
 else:
-    print("fail")
+    print('FAIL')
