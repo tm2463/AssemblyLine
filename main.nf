@@ -2,24 +2,23 @@
 
 def printHelp() {
     log.info """
-==========================================
 Usage:
     nextflow run main.nf --input manifest.csv [options]
 
 Required:
-    --input             Path to input manifest (columns: ID, R1, R2)
+    --input                             Path to input manifest (columns: ID, R1, R2)
 
 Optional:
-    --help              Show this help message
+    --help                              Show this help message
 
-Example:
-    nextflow run main.nf \\
-        --input manifest.csv \\
-==========================================
+fastp:
+    --min_depth                         Default: 30
+    --lower_assembly_length             Default: 5500000
 """
 }
 
-include { FASTP } from './modules/preprocessing.nf'
+include { FASTP 
+          FILTER_FASTP } from './modules/preprocessing.nf'
 
 workflow {
 
@@ -44,6 +43,7 @@ workflow {
         }
     
     FASTP(input_ch)
+    | FILTER_FASTP
 
     // profile samples with sylph
     // map to reference with bwa
