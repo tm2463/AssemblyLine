@@ -1,11 +1,11 @@
 process FASTP {
     // https://github.com/opengene/fastp
-    cpus 4
+    cpus 8
     memory 4.GB
 
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
     
-    publishDir "${params.outdir}/*.json", mode: 'copy'
+    publishDir "${params.outdir}/fastp", mode: 'copy', pattern: '*.json'
 
     input:
     tuple val(ID), path(R1), path(R2)
@@ -14,8 +14,8 @@ process FASTP {
     tuple val(ID), path(out1), path(out2), path("${ID}.json")
 
     script:
-    out1="fastp-${ID}_1.fq.gz"
-    out2="fastp-${ID}_2.fq.gz"
+    out1="${ID}_1_fastp.fq.gz"
+    out2="${ID}_2_fastp.fq.gz"
     """
     fastp --thread ${task.cpus} --in1 ${R1} --in2 ${R2} --out1 ${out1} --out2 ${out2} -j ${ID}.json
     """
@@ -34,7 +34,7 @@ process FILTER_FASTP {
     tuple val(ID), path(R1), path(R2), path(fastp_json)
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout 
+    tuple val(ID), path(R1), path(R2), stdout, emit: filter_ch
 
     script:
     def command="${projectDir}/bin/pass_fail_fastp.py"
