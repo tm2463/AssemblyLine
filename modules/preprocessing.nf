@@ -1,7 +1,6 @@
 process FASTP {
     // https://github.com/opengene/fastp
-    cpus 8
-    memory 4.GB
+    label 'medium'
 
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
     
@@ -27,8 +26,7 @@ process FILTER_FASTP {
     // Minimum sequence depth = 30x
     // Lower assembly length limit = 5.5Mbp
     // Total base count = 165Mbp
-    cpus 1
-    memory 1.GB
+    label 'small'
 
     input:
     tuple val(ID), path(R1), path(R2), path(fastp_json)
@@ -45,8 +43,7 @@ process FILTER_FASTP {
 
 process SYLPH {
     // https://github.com/bluenote-1577/sylph
-    cpus 8
-    memory 8.GB
+    label 'medium'
 
     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
 
