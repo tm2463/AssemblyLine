@@ -60,7 +60,8 @@ process SYLPH {
 
     script:
     """
-    sylph profile ${params.sylph_db} -t ${task.cpus} -1 ${R1} -2 ${R2} > ${ID}_sylph_profile.tsv
+    sylph sketch -t ${task.cpus} -1 ${R1} -2 ${R2} -d ${ID}_sketch
+    sylph profile -t ${task.cpus} ${params.sylph_db} *.sylsp > ${ID}_sylph_profile.tsv
     """
 }
 
