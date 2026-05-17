@@ -5,13 +5,13 @@ process FASTP {
 
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
     
-    publishDir 
+    publishDir "${params.outdir}/*.json", mode: 'copy'
 
     input:
     tuple val(ID), path(R1), path(R2)
 
     output:
-    tuple val(ID), path(out1), path(out2), path("${ID}.json"), emit: trimmed_fastqs
+    tuple val(ID), path(out1), path(out2), path("${ID}.json")
 
     script:
     out1="fastp-${ID}_1.fq.gz"
