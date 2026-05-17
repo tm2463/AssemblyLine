@@ -19,18 +19,18 @@ process FASTP {
     """
 }
 
-process SYLPH {
-    // https://github.com/bluenote-1577/sylph
-    cpus 8
-    memory 8.GB
+// process SYLPH {
+//     // https://github.com/bluenote-1577/sylph
+//     cpus 8
+//     memory 8.GB
 
-    container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
-}
+//     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
+// }
 
-process BWA {
-    // https://github.com/bwa-mem2/bwa-mem2
-    cpus 8
-    memory 8.GB
+// process BWA {
+//     // https://github.com/bwa-mem2/bwa-mem2
+//     cpus 8
+//     memory 8.GB
 
-    container "quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0"
-}
+//     container "quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0"
+// }
