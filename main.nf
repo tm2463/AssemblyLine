@@ -22,7 +22,8 @@ sylph:
 
 include { FASTP 
           FILTER_FASTP 
-          SYLPH } from './modules/preprocessing.nf'
+          SYLPH 
+          FILTER_SYLPH } from './modules/preprocessing.nf'
 
 workflow {
 
@@ -51,6 +52,10 @@ workflow {
     | filter { ID, R1, R2, fastp_out -> fastp_out.trim() == 'PASS' }
     | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
     | SYLPH
+    | FILTER_SYLPH
+    | filter { ID, R1, R2, sylph_out -> sylph_out.trim() == 'PASS' }
+    | map { ID, R1, R2, sylph_out -> tuple(ID, R1, R2) }
+    // | BWA   
 
 
     

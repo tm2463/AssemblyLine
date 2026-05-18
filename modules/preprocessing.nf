@@ -65,6 +65,21 @@ process SYLPH {
 process FILTER_SYLPH {
     // https://www.nature.com/articles/s41467-021-24128-2
     // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
+    label 'small'
+
+    container "quay.io/biocontainers/pandas:2.2.1"
+
+    input:
+    tuple val(ID), path(R1), path(R2), path(sylph_profile)
+
+    output:
+    tuple val(ID), path(R1), path(R2), stdout, emit: sylph_out
+
+    script:
+    def command="${projectDir}/bin/pass_fail_sylph.py"
+    """
+    ${command} ${ID} ${sylph_profile} ${params.min_depth}
+    """
 }
 
 // process BWA {
