@@ -62,6 +62,11 @@ process SYLPH {
     """
 }
 
+process FILTER_SYLPH {
+    // https://www.nature.com/articles/s41467-021-24128-2
+    // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
+}
+
 // process BWA {
 //     // https://github.com/bwa-mem2/bwa-mem2
 //     cpus 8
