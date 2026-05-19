@@ -26,7 +26,8 @@ include { FASTP
           SYLPH_TAX_FILE
           SYLPH 
           SYLPH_TAX 
-          BWA } from './modules/preprocessing.nf'
+          BWA 
+          SAMTOOLS } from './modules/preprocessing.nf'
 
 workflow {
 
@@ -49,12 +50,16 @@ workflow {
             def R2 = file(row.R2, checkIfExists: true)
             tuple(ID, R1, R2)
         }
-    
+
     FASTP(input_ch)
     | FILTER_FASTP
     | filter { it -> it[3].trim() == 'PASS' }
     | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
-    | SYLPH
+    | set { fastp_out_ch }
+
+    sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))
+    
+    SYLPH(fastp_out_ch, sylph_db_ch)
     
     SYLPH_TAX_FILE()
 
@@ -64,5 +69,6 @@ workflow {
         | filter { it -> it[3].trim() == 'PASS' }
         | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
         | BWA
+        | SAMTOOLS
 
 }

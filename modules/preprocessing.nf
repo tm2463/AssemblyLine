@@ -52,6 +52,7 @@ process SYLPH {
 
     input:
     tuple val(ID), path(R1), path(R2)
+    path(sylph_db)
 
     output:
     tuple val(ID), path(R1), path(R2), path("${ID}_sylph_profile.tsv"), emit: sylph_out
@@ -59,7 +60,7 @@ process SYLPH {
     script:
     """
     sylph sketch -t ${task.cpus} -1 ${R1} -2 ${R2} -d ${ID}_sketch
-    sylph profile -t ${task.cpus} ${params.sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv
+    sylph profile -t ${task.cpus} ${sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv
     """
 }
 
@@ -129,15 +130,23 @@ process BWA {
     """
 }
 
-// process SAMTOOLS {
-//     // https://github.com/samtools/samtools
-//     label 'medium'
+process SAMTOOLS {
+    // https://github.com/samtools/samtools
+    // Mapping to reference 
+    label 'medium'
 
-//     container "quay.io/biocontainers/samtools:1.23.1--ha83d96e_0"
+    container "quay.io/biocontainers/samtools:1.23.1--ha83d96e_0"
 
-//     input:
-//     tuple val(ID), path(R1), path(R2), path(sam_file)
+    input:
+    tuple val(ID), path(R1), path(R2), path(sam_file)
 
-//     output:
-//     tuple val(ID), path(R1), path(R2), stdout
-// }
+    output:
+    tuple val(ID), path(R1), path(R2), stdout
+
+    script:
+    """
+    samtools sort -@ ${task.cpus} -o ${ID}.sorted.bam ${sam_file}
+    samtools index -@ ${task.cpus} ${ID}.sorted.bam
+    samtools stats ${ID}.sorted.bam
+    """
+}
