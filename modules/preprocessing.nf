@@ -141,12 +141,12 @@ process SAMTOOLS {
     tuple val(ID), path(R1), path(R2), path(sam_file)
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout
+    tuple val(ID), path(R1), path(R2), path("${ID}_mapping_stats.txt")
 
     script:
     """
     samtools sort -@ ${task.cpus} -o ${ID}.sorted.bam ${sam_file}
     samtools index -@ ${task.cpus} ${ID}.sorted.bam
-    samtools stats ${ID}.sorted.bam
+    samtools stats ${ID}.sorted.bam > ${ID}_mapping_stats.txt
     """
 }
