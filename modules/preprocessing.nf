@@ -94,10 +94,10 @@ process SYLPH_TAX {
     script:
     // 'PASS' if sylph-tax returns "s__Pseudomonas aerguinosa" and meets filter criteria, else 'FAIL'
     """
-    sylph-tax taxprof ${sylph_profile} -t ${tax_file} -o ${ID}
+    sylph-tax taxprof ${sylph_profile} -t ${tax_file} -o ${ID} 1>&2
 
-    grep "s__Pseudomonas aeruginosa|t__" ${ID}_taxprof.tsv \
-        | awk -F'\t' 'BEGIN{OFS="\\t"} $2 > 98 && $3 > 98 && $4 > 95 && $5 > ${params.min_depth} {print \$2, \$3, \$4, \$5}' \
+    grep "s__Pseudomonas aeruginosa|t__" ${ID}*.sylphmpa \
+        | awk -F'\t' 'BEGIN{OFS="\\t"} \$2 > 98 && \$3 > 98 && \$4 > 95 && \$5 > ${params.min_depth} {print \$2, \$3, \$4, \$5}' \
         > ${ID}_tax.tsv
 
     if [ -s ${ID}_tax.tsv ]; then
