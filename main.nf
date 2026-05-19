@@ -1,26 +1,6 @@
 #!/usr/bin/env nextflow
 
-def printHelp() {
-    log.info """
-Usage:
-    nextflow run main.nf --input manifest.csv [options]
-
-Required:
-    --input                             Path to input manifest (columns: ID, R1, R2)
-
-Optional:
-    --help                              Show this help message
-
-fastp:
-    --min_depth                         Default: 30
-    --lower_assembly_length             Default: 5500000
-
-sylph:
-    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
-    --sylph_taxonomy                    Sylph taxonomy label (default: gtdb_r232)
-"""
-}
-
+include { printHelp } from './modules/helper_functions.nf'
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
 
 workflow {
@@ -28,11 +8,6 @@ workflow {
     if (params.help) {
         printHelp()
         exit 0
-    }
-
-    if (!params.input) {
-        log.error "No input provided. Use --input <path> or use --help for usage."
-        exit 1
     }
 
     input_ch = Channel
