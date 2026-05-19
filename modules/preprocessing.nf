@@ -53,7 +53,7 @@ process SYLPH {
     tuple val(ID), path(R1), path(R2)
 
     output:
-    tuple val(ID), path(R1), path(R2), path("${ID}_sylph_profile.tsv")
+    tuple val(ID), path(R1), path(R2), path("${ID}_sylph_profile.tsv"), emit: sylph_out
 
     script:
     """
@@ -62,23 +62,42 @@ process SYLPH {
     """
 }
 
-process FILTER_SYLPH {
-    // https://www.nature.com/articles/s41467-021-24128-2
-    // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
+process SYLPH_TAX_FILE {
     label 'small'
 
-    container "quay.io/biocontainers/pandas:2.2.1"
+    container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
-    input:
-    tuple val(ID), path(R1), path(R2), path(sylph_profile)
+    publishDir "${params.outdir}/sylph"
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout, emit: sylph_out
+    path("${params.sylph_taxonomy}_metadata.tsv.gz"), emit: tax
 
     script:
-    def command="${projectDir}/bin/pass_fail_sylph.py"
     """
-    ${command} ${ID} ${sylph_profile} ${params.min_depth}
+    sylph-tax download --download-to .
+    """
+}
+
+process SYLPH_TAX {
+    label 'small'
+
+    container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
+
+    publishDir "${params.outdir}/sylph", pattern: '*_tax.tsv'
+
+    input:
+    tuple val(ID), path(R1), path(R2), path(sylph_profile), path(tax_file)
+
+    output:
+    tuple val(ID), path(R1), path(R2), path("${ID}_tax.tsv"), emit: sylph_tax
+
+    script:
+    """
+    sylph-tax taxprof ${sylph_profile} -t ${tax_file} -o ${ID}
+
+    grep "s__Pseudomonas aeruginosa|t__" ${ID}*.sylphmpa \
+        | awk -F'\t' 'BEGIN{OFS="\\t"} {print \$1, \$2, \$3, \$4, \$5}' \
+        > ${ID}_tax.tsv
     """
 }
 

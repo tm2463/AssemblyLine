@@ -17,13 +17,15 @@ fastp:
 
 sylph:
     --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
+    --sylph_taxonomy                    Sylph taxonomy label (default: gtdb_r232)
 """
 }
 
 include { FASTP 
           FILTER_FASTP 
+          SYLPH_TAX_FILE
           SYLPH 
-          FILTER_SYLPH } from './modules/preprocessing.nf'
+          SYLPH_TAX } from './modules/preprocessing.nf'
 
 workflow {
 
@@ -52,9 +54,16 @@ workflow {
     | filter { ID, R1, R2, fastp_out -> fastp_out.trim() == 'PASS' }
     | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
     | SYLPH
-    | FILTER_SYLPH
-    | filter { ID, R1, R2, sylph_out -> sylph_out.trim() == 'PASS' }
-    | map { ID, R1, R2, sylph_out -> tuple(ID, R1, R2) }
+    
+    SYLPH_TAX_FILE()
+
+    SYLPH.out.sylph_out
+        .map { ID, R1, R2, sylph_profile -> tuple(ID, R1, R2, sylph_profile) }
+        .combine(SYLPH_TAX_FILE.out.tax)
+        .map { ID, R1, R2, sylph_profile, tax_file -> tuple(ID, R1, R2, sylph_profile, tax_file) }
+        | SYLPH_TAX
+
+
     // | BWA   
 
 
