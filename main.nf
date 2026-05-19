@@ -25,7 +25,8 @@ include { FASTP
           FILTER_FASTP 
           SYLPH_TAX_FILE
           SYLPH 
-          SYLPH_TAX } from './modules/preprocessing.nf'
+          SYLPH_TAX 
+          BWA } from './modules/preprocessing.nf'
 
 workflow {
 
@@ -51,26 +52,17 @@ workflow {
     
     FASTP(input_ch)
     | FILTER_FASTP
-    | filter { ID, R1, R2, fastp_out -> fastp_out.trim() == 'PASS' }
+    | filter { it -> it[3].trim() == 'PASS' }
     | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
     | SYLPH
     
     SYLPH_TAX_FILE()
 
     SYLPH.out.sylph_out
-        .map { ID, R1, R2, sylph_profile -> tuple(ID, R1, R2, sylph_profile) }
         .combine(SYLPH_TAX_FILE.out.tax)
-        .map { ID, R1, R2, sylph_profile, tax_file -> tuple(ID, R1, R2, sylph_profile, tax_file) }
         | SYLPH_TAX
-        | filter { ID, R1, R2, sylph_out -> sylph_out.trim() == 'PASS' }
-        
+        | filter { it -> it[3].trim() == 'PASS' }
+        | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
+        | BWA
 
-
-    // | BWA   
-
-
-    
-
-    // profile samples with sylph
-    // map to reference with bwa
 }

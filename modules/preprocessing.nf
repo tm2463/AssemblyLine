@@ -15,6 +15,7 @@ process FASTP {
     script:
     out1="${ID}_1_fastp.fq.gz"
     out2="${ID}_2_fastp.fq.gz"
+    def command="${projectDir}/bin/pass_fail_fastp.py"
     """
     fastp --thread ${task.cpus} --in1 ${R1} --in2 ${R2} --out1 ${out1} --out2 ${out2} -j ${ID}.json
     """
@@ -89,7 +90,7 @@ process SYLPH_TAX {
     tuple val(ID), path(R1), path(R2), path(sylph_profile), path(tax_file)
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout, emit: sylph_tax
+    tuple val(ID), path(R1), path(R2), stdout
 
     script:
     // 'PASS' if sylph-tax returns "s__Pseudomonas aerguinosa" and meets filter criteria, else 'FAIL'
@@ -108,10 +109,35 @@ process SYLPH_TAX {
     """
 }
 
-// process BWA {
-//     // https://github.com/bwa-mem2/bwa-mem2
-//     cpus 8
-//     memory 8.GB
+process BWA {
+    // https://github.com/bwa-mem2/bwa-mem2
+    label 'medium'
 
-//     container "quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0"
+    container "quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0"
+
+    input:
+    tuple val(ID), path(R1), path(R2)
+
+    output:
+    tuple val(ID), path(R1), path(R2), path("${ID}.sam")
+
+    script:
+    reference = "${projectDir}/data/GCF_000006765.1_ASM676v1_genomic.fna.gz"
+    """
+    bwa-mem2 index -p ${ID} ${reference}
+    bwa-mem2 mem -t ${task.cpus} ${ID} ${R1} ${R2} > ${ID}.sam
+    """
+}
+
+// process SAMTOOLS {
+//     // https://github.com/samtools/samtools
+//     label 'medium'
+
+//     container "quay.io/biocontainers/samtools:1.23.1--ha83d96e_0"
+
+//     input:
+//     tuple val(ID), path(R1), path(R2), path(sam_file)
+
+//     output:
+//     tuple val(ID), path(R1), path(R2), stdout
 // }
