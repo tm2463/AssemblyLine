@@ -62,6 +62,8 @@ workflow {
         .combine(SYLPH_TAX_FILE.out.tax)
         .map { ID, R1, R2, sylph_profile, tax_file -> tuple(ID, R1, R2, sylph_profile, tax_file) }
         | SYLPH_TAX
+        | filter { ID, R1, R2, sylph_out -> sylph_out.trim() == 'PASS' }
+        
 
 
     // | BWA   

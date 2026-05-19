@@ -79,25 +79,32 @@ process SYLPH_TAX_FILE {
 }
 
 process SYLPH_TAX {
+    // https://www.nature.com/articles/s41467-021-24128-2
+    // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
     label 'small'
 
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
-
-    publishDir "${params.outdir}/sylph", pattern: '*_tax.tsv'
 
     input:
     tuple val(ID), path(R1), path(R2), path(sylph_profile), path(tax_file)
 
     output:
-    tuple val(ID), path(R1), path(R2), path("${ID}_tax.tsv"), emit: sylph_tax
+    tuple val(ID), path(R1), path(R2), stdout, emit: sylph_tax
 
     script:
+    // 'PASS' if sylph-tax returns "s__Pseudomonas aerguinosa" and meets filter criteria, else 'FAIL'
     """
     sylph-tax taxprof ${sylph_profile} -t ${tax_file} -o ${ID}
 
-    grep "s__Pseudomonas aeruginosa|t__" ${ID}*.sylphmpa \
-        | awk -F'\t' 'BEGIN{OFS="\\t"} {print \$1, \$2, \$3, \$4, \$5}' \
+    grep "s__Pseudomonas aeruginosa|t__" ${ID}_taxprof.tsv \
+        | awk -F'\t' 'BEGIN{OFS="\\t"} $2 > 98 && $3 > 98 && $4 > 95 && $5 > ${params.min_depth} {print \$2, \$3, \$4, \$5}' \
         > ${ID}_tax.tsv
+
+    if [ -s ${ID}_tax.tsv ]; then
+        echo "PASS"
+    else
+        echo "FAIL"
+    fi
     """
 }
 
