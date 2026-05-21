@@ -129,24 +129,3 @@ process BWA {
     bwa-mem2 mem -t ${task.cpus} ${ID} ${R1} ${R2} > ${ID}.sam
     """
 }
-
-process SAMTOOLS {
-    // https://github.com/samtools/samtools
-    // Mapping to reference 
-    label 'medium'
-
-    container "quay.io/biocontainers/samtools:1.23.1--ha83d96e_0"
-
-    input:
-    tuple val(ID), path(R1), path(R2), path(sam_file)
-
-    output:
-    tuple val(ID), path(R1), path(R2), path("${ID}_mapping_stats.txt")
-
-    script:
-    """
-    samtools sort -@ ${task.cpus} -o ${ID}.sorted.bam ${sam_file}
-    samtools index -@ ${task.cpus} ${ID}.sorted.bam
-    samtools stats ${ID}.sorted.bam > ${ID}_mapping_stats.txt
-    """
-}

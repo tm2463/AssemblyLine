@@ -5,8 +5,7 @@ include { FASTP
           SYLPH_TAX_FILE
           SYLPH 
           SYLPH_TAX 
-          BWA 
-          SAMTOOLS } from '../modules/preprocessing.nf'
+          BWA } from '../modules/preprocessing.nf'
 
 workflow PREPROCESSING {
 
@@ -31,10 +30,6 @@ workflow PREPROCESSING {
         | SYLPH_TAX
         | filter { it -> it[3].trim() == 'PASS' }
         | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
-        | BWA
-        | SAMTOOLS
-        | filter { it -> it[3].trim() == 'PASS' }
-        | map { ID, R1, R2, mapping_out -> tuple(ID, R1, R2) }
         | set { preprocessed_ch }
 
     emit:
