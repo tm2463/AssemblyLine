@@ -1,7 +1,9 @@
 #!/usr/bin/env nextflow
 
 include { printHelp } from './modules/helper_functions.nf'
+
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
+include { SHOVILL } from './modules/assembly.nf'
 
 workflow {
 
@@ -21,13 +23,11 @@ workflow {
         }
 
     def assembly_ch
-
-    // samtools output needs filtering -> currently just emits mapping stats
-    // need filter script to print PASS/FAIL to stdout
     if (!params.skip_preprocessing) {
         assembly_ch = PREPROCESSING(input_ch)
     } else {
         assembly_ch = input_ch
     }
 
+    SHOVILL(assembly_ch)
 }
