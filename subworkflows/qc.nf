@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-include { QUAST } from '../modules/qc.nf'
+include { QUAST 
+          QUAST_SUMMARY } from '../modules/qc.nf'
 
 workflow QC {
 
@@ -10,15 +11,12 @@ workflow QC {
     main:
     assembly_ch
         .multiMap { ID, fastas ->
-            ids: ID
             fastas: fastas
         }
         .set { split_ch }
     
-    QUAST(
-        split_ch.ids.collect(),
-        split_ch.fastas.collect()
-    )
+    QUAST(split_ch.fastas.collect())
+    | QUAST_SUMMARY
 
     // emit:
     // qc_ch
