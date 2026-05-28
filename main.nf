@@ -31,5 +31,5 @@ workflow {
     }
 
     SHOVILL(assembly_ch)
-    | QC()
+    | QC
 }

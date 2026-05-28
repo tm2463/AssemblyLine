@@ -20,6 +20,6 @@ workflow QC {
         split_ch.fastas.collect()
     )
 
-    emit:
-    qc_ch
+    // emit:
+    // qc_ch
 }
