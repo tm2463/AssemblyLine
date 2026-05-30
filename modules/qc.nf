@@ -21,7 +21,7 @@ process GUNC {
     // https://github.com/grp-bork/gunc
     label 'medium'
 
-    container "quay.io/biocontainers/gunc:1.1.1--pyhdfd78af_0"
+    container "quay.io/biocontainers/gunc:1.0.6--pyhdfd78af_1"
 
     input:
     path fastas, stageAs: 'fastas/*'

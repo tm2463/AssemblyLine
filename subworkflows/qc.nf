@@ -15,7 +15,6 @@ workflow QC {
     CHECKM2(assembly_ch, checkm2_db_ch)
     GUNC(assembly_ch, gunc_db_ch)
     
-
     // emit:
     // qc_ch
 }
