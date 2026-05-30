@@ -1,37 +1,37 @@
-process QUAST {
-    // https://github.com/ablab/quast
-    label 'small'
+process CHECKM2 {
+    // https://github.com/chklovski/CheckM2
+    label 'medium'
 
-    container "quay.io/biocontainers/quast:5.3.0--py313pl5321h5ca1c30_2"
+    container "quay.io/biocontainers/checkm2:1.1.0--pyh7e72e81_1"
 
     input:
     path fastas, stageAs: 'fastas/*'
+    path checkm2_db
 
     output:
-    path "quast/transposed_report.tsv"
+    path "checkm2/quality_report.tsv"
 
     script:
     """
-    quast.py fastas/* -o quast --no-plot --no-html --threads ${task.cpus}
+    checkm2 predict --input fastas --output-directory checkm2 --threads ${task.cpus} -x .fa --database_path ${checkm2_db}
     """
 }
 
-process QUAST_SUMMARY {
-    label 'small'
+process GUNC {
+    // https://github.com/grp-bork/gunc
+    label 'medium'
 
-    container "quay.io/biocontainers/pandas:2.2.1"
-
-    publishDir mode: 'copy', path: "${params.outdir}/quast_summary/"
+    container "quay.io/biocontainers/gunc:1.1.1--pyhdfd78af_0"
 
     input:
-    path quast_report
+    path fastas, stageAs: 'fastas/*'
+    path gunc_db
 
     output:
-    path "quast_summary.tsv"
+    path "GUNC.*maxCSS_level.tsv"
 
     script:
-    def command = "${projectDir}/bin/quast_summary.py"
     """
-    ${command} --input ${quast_report} --output quast_summary.tsv
+    gunc run --input_dir fastas/ --db_file ${gunc_db} --threads ${task.cpus}
     """
 }
