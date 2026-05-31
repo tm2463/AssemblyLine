@@ -2,6 +2,8 @@ process CHECKM2 {
     // https://github.com/chklovski/CheckM2
     label 'medium'
 
+    publishDir "${params.outdir}/qc"
+
     container "quay.io/biocontainers/checkm2:1.1.0--pyh7e72e81_1"
 
     input:
@@ -20,6 +22,8 @@ process CHECKM2 {
 process GUNC {
     // https://github.com/grp-bork/gunc
     label 'medium'
+
+    publishDir "${params.outdir}/qc"
 
     container "quay.io/biocontainers/gunc:1.0.6--pyhdfd78af_1"
 

@@ -48,7 +48,7 @@ process SYLPH {
 
     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
 
-    publishDir "${params.outdir}/sylph", pattern: '*_sylph_profile.tsv'
+    publishDir "${params.outdir}/${ID}", pattern: '*_sylph_profile.tsv'
 
     input:
     tuple val(ID), path(R1), path(R2)
@@ -69,8 +69,6 @@ process SYLPH_TAX_FILE {
 
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
-    publishDir "${params.outdir}/sylph"
-
     output:
     path("${params.sylph_taxonomy}_metadata.tsv.gz"), emit: tax
 
@@ -85,6 +83,8 @@ process SYLPH_TAX {
     // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
     label 'small'
 
+    publishDir "${params.outdir}/${ID}", pattern: '${ID}*.sylphmpa'
+
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
     input:
@@ -94,7 +94,6 @@ process SYLPH_TAX {
     tuple val(ID), path(R1), path(R2), stdout
 
     script:
-    // 'PASS' if sylph-tax returns "s__Pseudomonas aerguinosa" and meets filter criteria, else 'FAIL'
     """
     sylph-tax taxprof ${sylph_profile} -t ${tax_file} -o ${ID} 1>&2
 
