@@ -11,12 +11,19 @@ Required:
 Optional:
     --help                              Show this help message
 
-fastp:
+Fastp:
     --min_depth                         Default: 30
     --lower_assembly_length             Default: 5500000
 
-sylph:
+Sylph:
     --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
-    --sylph_taxonomy                    Sylph taxonomy label (default: gtdb_r232)
+    --sylph_taxonomy                    Sylph taxonomy label (Default: gtdb_r232)
+
+Assembly:
+    --min_contig_length                 Default: 500
+
+QC:
+    --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
+    --gunc_db                           Path to gunc database (e.g. /path/to/gunc_db.dmnd)
 """
 }
