@@ -31,8 +31,6 @@ workflow {
     }
 
     SHOVILL(assembly_ch)
-        .map { ID, fastas -> fastas}
-        .collect()
-        | QC
+    | QC
 
 }

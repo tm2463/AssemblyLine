@@ -11,31 +11,11 @@ process CHECKM2 {
     path checkm2_db
 
     output:
-    path "checkm2/quality_report.tsv"
+    path "checkm2_report.tsv"
 
     script:
     """
     checkm2 predict --input fastas --output-directory checkm2 --threads ${task.cpus} -x .fa --database_path ${checkm2_db}
-    """
-}
-
-process GUNC {
-    // https://github.com/grp-bork/gunc
-    label 'medium'
-
-    publishDir "${params.outdir}/qc"
-
-    container "quay.io/biocontainers/gunc:1.0.6--pyhdfd78af_1"
-
-    input:
-    path fastas, stageAs: 'fastas/*'
-    path gunc_db
-
-    output:
-    path "GUNC.*maxCSS_level.tsv"
-
-    script:
-    """
-    gunc run --input_dir fastas/ --db_file ${gunc_db} --threads ${task.cpus}
+    mv checkm2/quality_report.tsv checkm2_report.tsv
     """
 }

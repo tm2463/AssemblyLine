@@ -4,8 +4,7 @@ include { FASTP
           FILTER_FASTP 
           SYLPH_TAX_FILE
           SYLPH 
-          SYLPH_TAX 
-          BWA } from '../modules/preprocessing.nf'
+          SYLPH_TAX } from '../modules/preprocessing.nf'
 
 workflow PREPROCESSING {
 
@@ -28,8 +27,8 @@ workflow PREPROCESSING {
     SYLPH.out.sylph_out
         .combine(SYLPH_TAX_FILE.out.tax)
         | SYLPH_TAX
-        | filter { it -> it[3].trim() == 'PASS' }
-        | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
+        | filter { it -> it[4].trim() == 'PASS' }
+        | map { ID, R1, R2, file, tax_out -> tuple(ID, R1, R2) }
         | set { preprocessed_ch }
 
     emit:

@@ -24,6 +24,5 @@ Assembly:
 
 QC:
     --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
-    --gunc_db                           Path to gunc database (e.g. /path/to/gunc_db.dmnd)
 """
 }

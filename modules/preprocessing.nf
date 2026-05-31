@@ -3,8 +3,6 @@ process FASTP {
     label 'medium'
 
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
-    
-    publishDir "${params.outdir}/fastp", pattern: '*.json'
 
     input:
     tuple val(ID), path(R1), path(R2)
@@ -48,7 +46,7 @@ process SYLPH {
 
     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
 
-    publishDir "${params.outdir}/${ID}", pattern: '*_sylph_profile.tsv'
+    publishDir "${params.outdir}/qc", pattern: '*_sylph_profile.tsv'
 
     input:
     tuple val(ID), path(R1), path(R2)
@@ -83,7 +81,7 @@ process SYLPH_TAX {
     // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
     label 'small'
 
-    publishDir "${params.outdir}/${ID}", pattern: '${ID}*.sylphmpa'
+    publishDir "${params.outdir}/qc", pattern: '*.sylphmpa'
 
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
@@ -91,40 +89,14 @@ process SYLPH_TAX {
     tuple val(ID), path(R1), path(R2), path(sylph_profile), path(tax_file)
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout
+    tuple val(ID), path(R1), path(R2), path("*.sylphmpa"), stdout
 
     script:
+    def filter = "\$2 > 98 && \$3 > 98 && \$4 > 95 && \$5 > ${params.min_depth}"
     """
-    sylph-tax taxprof ${sylph_profile} -t ${tax_file} -o ${ID} 1>&2
+    sylph-tax taxprof ${sylph_profile} -t ${tax_file} 1>&2
 
     awk 'NF' ${ID}*.sylphmpa | tail -n 1 \
-        | awk -F'\t' 'BEGIN{OFS="\\t"} \$2 > 98 && \$3 > 98 && \$4 > 95 && \$5 > ${params.min_depth} {print \$1, \$2, \$3, \$4, \$5}' \
-        > ${ID}_tax.tsv
-
-    if [ -s ${ID}_tax.tsv ]; then
-        echo "PASS"
-    else
-        echo "FAIL"
-    fi
-    """
-}
-
-process BWA {
-    // https://github.com/bwa-mem2/bwa-mem2
-    label 'medium'
-
-    container "quay.io/biocontainers/bwa-mem2:2.3--he70b90d_0"
-
-    input:
-    tuple val(ID), path(R1), path(R2)
-
-    output:
-    tuple val(ID), path(R1), path(R2), path("${ID}.sam")
-
-    script:
-    reference = "${projectDir}/data/GCF_000006765.1_ASM676v1_genomic.fna.gz"
-    """
-    bwa-mem2 index -p ${ID} ${reference}
-    bwa-mem2 mem -t ${task.cpus} ${ID} ${R1} ${R2} > ${ID}.sam
+        | awk -F'\t' '${filter} {found=1} END {print (found ? "PASS" : "FAIL")}'
     """
 }

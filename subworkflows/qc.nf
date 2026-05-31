@@ -1,7 +1,6 @@
 #!/usr/bin/env nextflow
 
-include { CHECKM2 
-          GUNC } from '../modules/qc.nf'
+include { CHECKM2 } from '../modules/qc.nf'
 
 workflow QC {
 
@@ -9,12 +8,12 @@ workflow QC {
     assembly_ch
 
     main:
-    checkm2_db_ch = Channel.value(file(params.checkm2_db, checkIfExists: true))
-    gunc_db_ch = Channel.value(file(params.gunc_db, checkIfExists: true))
-    
-    CHECKM2(assembly_ch, checkm2_db_ch)
-    GUNC(assembly_ch, gunc_db_ch)
-    
-    // emit:
-    // qc_ch
+    checkm2_db = Channel.value(file(params.checkm2_db, checkIfExists: true))
+
+    checkm2_ch = assembly_ch
+        .map { ID, fastas -> fastas}
+        .collect()
+
+    CHECKM2(checkm2_ch, checkm2_db)
+
 }

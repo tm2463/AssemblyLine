@@ -4,7 +4,7 @@ process SHOVILL {
 
     container "quay.io/biocontainers/shovill:1.4.2--hdfd78af_0"
 
-    publishDir "${params.outdir}/${ID}"
+    publishDir "${params.outdir}/assemblies"
 
     input:
     tuple val(ID), path(R1), path(R2)
