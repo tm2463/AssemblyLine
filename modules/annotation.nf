@@ -1,0 +1,7 @@
+process BAKTA {
+    //
+}
+
+process ABRICATE {
+    //
+}

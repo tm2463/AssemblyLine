@@ -5,6 +5,7 @@ include { printHelp } from './modules/helper_functions.nf'
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
 include { SHOVILL } from './modules/assembly.nf'
 include { QC } from './subworkflows/qc.nf'
+include { ANNOTATION } from './subworkflows/annotation.nf'
 
 workflow {
 
