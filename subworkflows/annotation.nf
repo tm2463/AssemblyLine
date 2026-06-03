@@ -9,7 +9,9 @@ workflow ANNOTATION {
     assembly_ch
 
     main:
-    BAKTA(assembly_ch)
+    bakta_db_ch = Channel.value(file(params.bakta_db, checkIfExists: true))
+    BAKTA(assembly_ch, bakta_db_ch)
+    ABRICATE(assembly_ch)
 
     // emit:
     // ANNOTATION.out.annotation_ch
