@@ -4,7 +4,7 @@ process BAKTA {
 
     container "quay.io/biocontainers/bakta:1.12.0--pyhdfd78af_0"
 
-    publishDir "${params.outdir}/${ID}/bakta"
+    publishDir "${params.outdir}/${ID}", pattern: 'annotation/*.gff3'
 
     input:
     tuple val(ID), path(contigs)
@@ -15,7 +15,7 @@ process BAKTA {
 
     script:
     """
-    bakta --db ${bakta_db} --output annotation/ --prefix ${ID} --threads ${task.cpus} ${contigs}
+    bakta ${contigs} --db ${bakta_db} --output annotation/ --prefix ${ID} --threads ${task.cpus}
     """
 }
 
