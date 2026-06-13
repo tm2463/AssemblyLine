@@ -24,5 +24,8 @@ Assembly:
 
 QC:
     --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
+
+Annotation:
+    --bakta_db                          Path to bakta database (e.g. /path/to/database)
 """
 }
