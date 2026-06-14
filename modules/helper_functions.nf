@@ -46,8 +46,8 @@ def validateParams() {
         exit 1
     }
 
-    if (params.read_type && !['short', 'long', 'hybrid'].contains(params.read_type)) {
-        log.error "Error: Invalid value for --read_type. Allowed values are 'short', 'long', or 'hybrid'."
+    if (params.mode && !['short', 'long', 'hybrid'].contains(params.mode)) {
+        log.error "Error: Invalid value for --mode. Allowed values are 'short', 'long', or 'hybrid'."
         exit 1
     }
 }
@@ -59,12 +59,17 @@ def validateManifest() {
         exit 1
     }
 
-    def headers = manifestFile.readLines().first().split(',')*.trim()
-    def requiredHeaders = ['ID', 'R1', 'R2', 'long_fastq', 'genome_size']
+    def requiredHeaders = [
+        short:  ['ID', 'R1', 'R2'],
+        long:   ['ID', 'long_fastq'],
+        hybrid: ['ID', 'R1', 'R2', 'long_fastq']
+    ]
 
-    def missingHeaders = requiredHeaders.findAll { !headers.contains(it) }
-    if (missingHeaders) {
-        log.error "Error: Manifest is missing required headers: ${missingHeaders.join(', ')}"
+    def headers = manifestFile.readLines().first().split(',')*.trim()
+    def missing = requiredHeaders[params.read_type]?.findAll { !headers.contains(it) }
+
+    if (missing) {
+        log.error "Error: Manifest is missing required headers for read_type '${params.read_type}': ${missing.join(', ')}"
         exit 1
     }
 }
@@ -74,21 +79,21 @@ def setInputChannel() {
         .fromPath(params.input)
         .splitCsv(header: true)
 
-    if (params.read_type == 'short') {
+    if (params.mode == 'short') {
         input_ch = input_ch.map { row ->
             def ID = row.ID
             def R1 = file(row.R1, checkIfExists: true)
             def R2 = file(row.R2, checkIfExists: true)
             tuple(ID, R1, R2)
         }
-    } else if (params.read_type == 'long') {
+    } else if (params.mode == 'long') {
         input_ch = input_ch.map { row ->
             def ID = row.ID
             def long_fastq = file(row.long_fastq, checkIfExists: true)
             def genome_size = row.genome_size ? row.genome_size.toInteger() : null
             tuple(ID, long_fastq, genome_size)
         }
-    } else if (params.read_type == 'hybrid') {
+    } else if (params.mode == 'hybrid') {
         input_ch = input_ch.map { row ->
             def ID = row.ID
             def R1 = file(row.R1, checkIfExists: true)

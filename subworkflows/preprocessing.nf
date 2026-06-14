@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 include { FASTP 
+          FASTPLONG
           FILTER_FASTP } from '../modules/fastp.nf'
 include { SYLPH_TAX_FILE
           SYLPH 
@@ -12,10 +13,18 @@ workflow PREPROCESSING {
     input_ch
 
     main:
-    FASTP(input_ch)
-    | FILTER_FASTP
+    def filter_ch
+    if (params.mode == 'short') {
+        FASTP(input_ch)
+        filter_ch = FASTP.out.fastp
+    } else if (params.mode == 'long') {
+        FASTPLONG(input_ch)
+        filter_ch = FASTPLONG.out.fastplong
+    }
+
+    FILTER_FASTP(filter_ch)
     | filter { it -> it[3].trim() == 'PASS' }
-    | map { ID, R1, R2, fastp_out -> tuple(ID, R1, R2) }
+    | map { it -> it[0..2] }
     | set { fastp_out_ch }
 
     sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))

@@ -8,7 +8,7 @@ process FASTP {
     tuple val(ID), path(R1), path(R2)
 
     output:
-    tuple val(ID), path(out1), path(out2), path("${ID}.json")
+    tuple val(ID), path(out1), path(out2), path("${ID}.json"), emit: fastp
 
     script:
     out1="${ID}_1_fastp.fq.gz"
@@ -17,6 +17,25 @@ process FASTP {
     """
     fastp --thread ${task.cpus} --in1 ${R1} --in2 ${R2} --out1 ${out1} --out2 ${out2} -j ${ID}.json
     """
+}
+
+process FASTPLONG {
+    // https://github.com/OpenGene/fastplong/
+    label 'medium'
+
+    container "quay.io/biocontainers/fastplong:0.4.1--h224cc79_0"
+
+    input:
+    tuple val(ID), path(fastq), val(genome_size)
+
+    output:
+    tuple val(ID), path(out), val(genome_size), path("${ID}.json"), emit: fastplong
+
+    script:
+    out="${ID}_fastplong.fq.gz"
+    """
+    fastplong -i ${fastq} -o ${out} -j ${ID}.json
+    """ 
 }
 
 process FILTER_FASTP {
@@ -28,10 +47,10 @@ process FILTER_FASTP {
     label 'small'
 
     input:
-    tuple val(ID), path(R1), path(R2), path(fastp_json)
+    tuple val(ID), path(col2), path(col3), path(fastp_json)
 
     output:
-    tuple val(ID), path(R1), path(R2), stdout, emit: fastp_out
+    tuple val(ID), path(col2), path(col3), stdout, emit: fastp_out
 
     script:
     def command="${projectDir}/bin/pass_fail_fastp.py"
