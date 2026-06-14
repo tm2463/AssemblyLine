@@ -11,7 +11,7 @@ process SYLPH {
     path(sylph_db)
 
     output:
-    tuple val(ID), path(reads), path("${ID}_sylph_profile.tsv"), emit: sylph_out
+    tuple val(ID), path(reads), val(genome_size), path("${ID}_sylph_profile.tsv"), emit: sylph_out
 
     script:
     """
@@ -54,10 +54,10 @@ process SYLPH_TAX {
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
     input:
-    tuple val(ID), path(reads), path(sylph_profile), path(tax_file)
+    tuple val(ID), path(reads), val(genome_size), path(sylph_profile), path(tax_file)
 
     output:
-    tuple val(ID), path(reads), path("*.sylphmpa"), stdout
+    tuple val(ID), path(reads), val(genome_size), path("*.sylphmpa"), stdout
 
     script:
     def filter = "\$2 > 98 && \$3 > 98 && \$4 > 95 && \$5 > ${params.min_depth}"

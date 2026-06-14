@@ -38,7 +38,7 @@ workflow PREPROCESSING {
     SYLPH.out.sylph_out
         .combine(SYLPH_TAX_FILE.out.tax)
         | SYLPH_TAX
-        | filter { it -> it[3].trim() == 'PASS' }
+        | filter { it -> it[4].trim() == 'PASS' }
         | map { it -> it[0..2] }
         | set { preprocessed_ch }
 
