@@ -5,10 +5,10 @@ process FASTP {
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
 
     input:
-    tuple val(ID), path(reads), val(na)
+    tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path(out1), path(out2), val(na), path("${ID}.json"), emit: fastp
+    tuple val(ID), path(out1), path(out2), val(size), path("${ID}.json"), emit: fastp
 
     script:
     def R1="${reads[0]}"
@@ -27,10 +27,10 @@ process FASTPLONG {
     container "quay.io/biocontainers/fastplong:0.4.1--h224cc79_0"
 
     input:
-    tuple val(ID), path(reads), val(genome_size)
+    tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path("${ID}_fastplong.fq.gz"), val(genome_size), path("${ID}.json"), emit: fastplong
+    tuple val(ID), path("${ID}_fastplong.fq.gz"), val(size), path("${ID}.json"), emit: fastplong
 
     script:
     def fastq="${reads[0]}"
@@ -49,10 +49,10 @@ process FILTER_FASTP {
     label 'small'
 
     input:
-    tuple val(ID), path(reads), val(genome_size), path(fastp_json)
+    tuple val(ID), path(reads), val(size), path(fastp_json)
 
     output:
-    tuple val(ID), path(reads), val(genome_size), stdout, emit: fastp_out
+    tuple val(ID), path(reads), val(size), stdout, emit: fastp_out
 
     script:
     def command="${projectDir}/bin/pass_fail_fastp.py"

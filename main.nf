@@ -6,7 +6,7 @@ include { printHelp
           validateManifest } from './modules/helper_functions.nf'
 
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
-include { SHOVILL } from './modules/assembly.nf'
+include { ASSEMBLY } from './subworkflows/assembly.nf'
 include { QC } from './subworkflows/qc.nf'
 include { ANNOTATION } from './subworkflows/annotation.nf'
 
@@ -16,7 +16,6 @@ workflow {
         printHelp()
         exit 0
     }
-    
     validateParams()
     validateManifest()
 
@@ -29,7 +28,7 @@ workflow {
         assembly_ch = input_ch
     }
 
-    SHOVILL(assembly_ch)
+    ASSEMBLY(assembly_ch)
     | ( QC & ANNOTATION )
 
 }

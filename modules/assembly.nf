@@ -7,14 +7,39 @@ process SHOVILL {
     publishDir "${params.outdir}/${ID}"
 
     input:
-    tuple val(ID), path(R1), path(R2)
+    tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path("${ID}_contigs.fa"), emit: shovill_out
+    tuple val(ID), path("${ID}_contigs.fa")
 
     script:
+    def R1="${reads[0]}"
+    def R2="${reads[1]}"
     """
     shovill --outdir ${params.outdir} --R1 ${R1} --R2 ${R2} --cpus ${task.cpus} --minlen ${params.min_contig_length}
     mv results/contigs.fa "${ID}_contigs.fa"
+    """
+}
+
+process DRAGONFLYE {
+    // https://github.com/rpetit3/dragonflye
+    label 'large'
+
+    container "quay.io/biocontainers/dragonflye:1.2.1--hdfd78af_0"
+
+    publishDir "${params.outdir}/${ID}"
+
+    input:
+    tuple val(ID), path(reads), val(size)
+
+    output:
+    tuple val(ID), path("${ID}_contigs.fa")
+
+    script:
+    def fastq="${reads[0]}"
+    def genome_size = size != null ? "--gsize ${size}" : ""
+    def prefix = "${ID}_contigs.fa"
+    """
+    dragonflye --reads my-ont.fastq.gz ${genome_size} --prefix "${prefix}"
     """
 }
