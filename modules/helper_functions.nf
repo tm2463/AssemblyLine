@@ -10,7 +10,7 @@ Required:
 
 Modes:
     --skip_preprocessing                Skip preprocessing step (default: false)
-    --read_type                         Options: short, long, hybrid (default: short)
+    --mode                              Options: short, long, hybrid (default: short)
 
 Optional:
     --help                              Show this help message
@@ -66,7 +66,7 @@ def validateManifest() {
     ]
 
     def headers = manifestFile.readLines().first().split(',')*.trim()
-    def missing = requiredHeaders[params.read_type]?.findAll { !headers.contains(it) }
+    def missing = requiredHeaders[params.mode]?.findAll { !headers.contains(it) }
 
     if (missing) {
         log.error "Error: Manifest is missing required headers for read_type '${params.read_type}': ${missing.join(', ')}"

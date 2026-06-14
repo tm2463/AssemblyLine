@@ -2,3 +2,4 @@
 results/*
 .nextflow/*
 work/*
+singularity_cache/

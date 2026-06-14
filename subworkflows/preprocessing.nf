@@ -37,7 +37,7 @@ workflow PREPROCESSING {
         .combine(SYLPH_TAX_FILE.out.tax)
         | SYLPH_TAX
         | filter { it -> it[4].trim() == 'PASS' }
-        | map { ID, R1, R2, file, tax_out -> tuple(ID, R1, R2) }
+        | map { it -> it[0..2] }
         | set { preprocessed_ch }
 
     emit:
