@@ -17,9 +17,11 @@ workflow PREPROCESSING {
     if (params.mode == 'short') {
         FASTP(input_ch)
         filter_ch = FASTP.out.fastp
+            | map { ID, R1, R2, size, json -> tuple(ID, [R1, R2], size, json) }
     } else if (params.mode == 'long') {
         FASTPLONG(input_ch)
         filter_ch = FASTPLONG.out.fastplong
+            | map { ID, fastq, size, json -> tuple(ID, [fastq], size, json) }
     }
 
     FILTER_FASTP(filter_ch)
@@ -36,7 +38,7 @@ workflow PREPROCESSING {
     SYLPH.out.sylph_out
         .combine(SYLPH_TAX_FILE.out.tax)
         | SYLPH_TAX
-        | filter { it -> it[4].trim() == 'PASS' }
+        | filter { it -> it[3].trim() == 'PASS' }
         | map { it -> it[0..2] }
         | set { preprocessed_ch }
 

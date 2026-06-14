@@ -7,15 +7,25 @@ process SYLPH {
     publishDir "${params.outdir}/sylph/${ID}", pattern: '*_sylph_profile.tsv'
 
     input:
-    tuple val(ID), path(R1), path(R2)
+    tuple val(ID), path(reads), val(genome_size)
     path(sylph_db)
 
     output:
-    tuple val(ID), path(R1), path(R2), path("${ID}_sylph_profile.tsv"), emit: sylph_out
+    tuple val(ID), path(reads), path("${ID}_sylph_profile.tsv"), emit: sylph_out
 
     script:
     """
-    sylph sketch -t ${task.cpus} -1 ${R1} -2 ${R2} -d ${ID}_sketch
+    if [[ "${params.mode}" == "short" ]]; then
+        R1="${reads[0]}"
+        R2="${reads[1]}"
+        sylph sketch -t ${task.cpus} -1 \$R1 -2 \$R2 -d ${ID}_sketch
+    fi
+
+    if [[ "${params.mode}" == "long" ]]; then
+        fastq="${reads[0]}"
+        sylph sketch -t ${task.cpus} -d ${ID}_sketch \$fastq
+    fi
+
     sylph profile -t ${task.cpus} ${sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv
     """
 }
@@ -44,10 +54,10 @@ process SYLPH_TAX {
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
     input:
-    tuple val(ID), path(R1), path(R2), path(sylph_profile), path(tax_file)
+    tuple val(ID), path(reads), path(sylph_profile), path(tax_file)
 
     output:
-    tuple val(ID), path(R1), path(R2), path("*.sylphmpa"), stdout
+    tuple val(ID), path(reads), path("*.sylphmpa"), stdout
 
     script:
     def filter = "\$2 > 98 && \$3 > 98 && \$4 > 95 && \$5 > ${params.min_depth}"

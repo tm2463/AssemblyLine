@@ -61,7 +61,7 @@ def validateManifest() {
 
     def requiredHeaders = [
         short:  ['ID', 'R1', 'R2'],
-        long:   ['ID', 'long_fastq'],
+        long:   ['ID', 'long_fastq', 'genome_size'],
         hybrid: ['ID', 'R1', 'R2', 'long_fastq']
     ]
 
@@ -84,14 +84,14 @@ def setInputChannel() {
             def ID = row.ID
             def R1 = file(row.R1, checkIfExists: true)
             def R2 = file(row.R2, checkIfExists: true)
-            tuple(ID, R1, R2)
+            tuple(ID, [R1, R2], null)
         }
     } else if (params.mode == 'long') {
         input_ch = input_ch.map { row ->
             def ID = row.ID
             def long_fastq = file(row.long_fastq, checkIfExists: true)
             def genome_size = row.genome_size ? row.genome_size.toInteger() : null
-            tuple(ID, long_fastq, genome_size)
+            tuple(ID, [long_fastq], genome_size)
         }
     } else if (params.mode == 'hybrid') {
         input_ch = input_ch.map { row ->
@@ -100,7 +100,7 @@ def setInputChannel() {
             def R2 = file(row.R2, checkIfExists: true)
             def long_fastq = file(row.long_fastq, checkIfExists: true)
             def genome_size = row.genome_size ? row.genome_size.toInteger() : null
-            tuple(ID, R1, R2, long_fastq, genome_size)
+            tuple(ID, [R1, R2, long_fastq], genome_size)
         }
     }
     return input_ch
