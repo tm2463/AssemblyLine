@@ -16,7 +16,7 @@ workflow {
         printHelp()
         exit 0
     }
-
+    
     validateParams()
     validateManifest()
 

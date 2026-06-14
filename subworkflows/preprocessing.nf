@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
 include { FASTP 
-          FILTER_FASTP 
-          SYLPH_TAX_FILE
+          FILTER_FASTP } from '../modules/fastp.nf'
+include { SYLPH_TAX_FILE
           SYLPH 
-          SYLPH_TAX } from '../modules/preprocessing.nf'
+          SYLPH_TAX } from '../modules/sylph.nf'
 
 workflow PREPROCESSING {
 
@@ -33,4 +33,5 @@ workflow PREPROCESSING {
 
     emit:
     preprocessed_ch
+
 }
