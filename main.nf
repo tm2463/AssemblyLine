@@ -1,9 +1,12 @@
 #!/usr/bin/env nextflow
 
-include { printHelp } from './modules/helper_functions.nf'
+include { printHelp 
+          validateParams 
+          setInputChannel 
+          validateManifest } from './modules/helper_functions.nf'
 
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
-include { SHOVILL } from './modules/assembly.nf'
+include { ASSEMBLY } from './subworkflows/assembly.nf'
 include { QC } from './subworkflows/qc.nf'
 include { ANNOTATION } from './subworkflows/annotation.nf'
 
@@ -13,16 +16,10 @@ workflow {
         printHelp()
         exit 0
     }
+    validateParams()
+    validateManifest()
 
-    input_ch = Channel
-        .fromPath(params.input)
-        .splitCsv(header: true)
-        .map { row ->
-            def ID = row.ID
-            def R1 = file(row.R1, checkIfExists: true)
-            def R2 = file(row.R2, checkIfExists: true)
-            tuple(ID, R1, R2)
-        }
+    input_ch = setInputChannel()
 
     def assembly_ch
     if (!params.skip_preprocessing) {
@@ -31,7 +28,7 @@ workflow {
         assembly_ch = input_ch
     }
 
-    SHOVILL(assembly_ch)
+    ASSEMBLY(assembly_ch)
     | ( QC & ANNOTATION )
 
 }
