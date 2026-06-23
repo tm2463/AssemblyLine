@@ -45,3 +45,27 @@ process DRAGONFLYE {
     mv results/contigs.fa "${prefix}"
     """
 }
+
+process MAKE_UNIQUE_READ_IDS {
+    label 'small'
+
+    input:
+    tuple val(ID), path(reads), val(size)
+
+    output:
+    tuple val(ID), path("${ID}.unique.fq.gz"), val(size)
+
+    script:
+    """
+    zcat ${reads} \
+    | awk '
+        NR%4==1 {
+            sub(/^@/, "", \$0)
+            print "@" \$0 "_" ++i
+            next
+        }
+        {print}
+    ' \
+    | gzip > ${ID}.unique.fq.gz
+    """
+}

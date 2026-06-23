@@ -1,7 +1,8 @@
 #!/usr/bin/env nextflow
 
 include { SHOVILL 
-          DRAGONFLYE } from '../modules/assembly.nf'
+          DRAGONFLYE 
+          MAKE_UNIQUE_READ_IDS } from '../modules/assembly.nf'
 
 workflow ASSEMBLY {
 
@@ -13,7 +14,8 @@ workflow ASSEMBLY {
         SHOVILL(assembly_ch)
         contigs = SHOVILL.out
     } else {
-        DRAGONFLYE(assembly_ch)
+        MAKE_UNIQUE_READ_IDS(assembly_ch)
+        | DRAGONFLYE
         contigs = DRAGONFLYE.out
     }
 

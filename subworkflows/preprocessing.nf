@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 include { FASTP 
-          FASTPLONG
+          FASTPLONG 
           FILTER_FASTP } from '../modules/fastp.nf'
 include { SYLPH_TAX_FILE
           SYLPH 
