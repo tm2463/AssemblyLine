@@ -12,25 +12,21 @@ Modes:
     --skip_preprocessing                Skip preprocessing step (default: false)
     --mode                              Options: short, long, hybrid (default: short)
 
-Optional:
-    --help                              Show this help message
-
 Fastp:
     --min_depth                         Default: 30
     --lower_assembly_length             Default: 5500000
 
-Sylph:
-    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
-    --sylph_taxonomy                    Sylph taxonomy label (Default: gtdb_r232)
-
 Assembly:
     --min_contig_length                 Default: 500
 
-QC:
+Databases:
+    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
     --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
-
-Annotation:
     --bakta_db                          Path to bakta database (e.g. /path/to/database)
+
+Optional:
+    --help                              Show this help message
+    --sylph_taxonomy                    Sylph taxonomy label (Default: gtdb_r232)
 """
 }
 

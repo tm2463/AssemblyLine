@@ -1,5 +1,6 @@
 process SHOVILL {
     // https://github.com/tseemann/shovill
+    tag "${ID}"
     label 'large'
 
     container "quay.io/biocontainers/shovill:1.4.2--hdfd78af_0"
@@ -23,6 +24,7 @@ process SHOVILL {
 
 process DRAGONFLYE {
     // https://github.com/rpetit3/dragonflye
+    tag "${ID}"
     label 'large'
 
     container "quay.io/biocontainers/dragonflye:1.2.1--hdfd78af_0"
@@ -47,6 +49,7 @@ process DRAGONFLYE {
 }
 
 process MAKE_UNIQUE_READ_IDS {
+    tag "${ID}"
     label 'small'
 
     input:

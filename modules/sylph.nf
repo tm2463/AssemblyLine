@@ -1,10 +1,11 @@
 process SYLPH {
     // https://github.com/bluenote-1577/sylph
+    tag "${ID}"
     label 'medium'
 
     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
 
-    publishDir "${params.outdir}/sylph/${ID}", pattern: '*_sylph_profile.tsv'
+    publishDir "${params.outdir}/${ID}", pattern: '*_sylph_profile.tsv'
 
     input:
     tuple val(ID), path(reads), val(genome_size)
@@ -47,9 +48,10 @@ process SYLPH_TAX_FILE {
 process SYLPH_TAX {
     // https://www.nature.com/articles/s41467-021-24128-2
     // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
+    tag "${ID}"
     label 'small'
 
-    publishDir "${params.outdir}/sylph/${ID}", pattern: '*.sylphmpa'
+    publishDir "${params.outdir}/${ID}", pattern: '*.sylphmpa'
 
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 

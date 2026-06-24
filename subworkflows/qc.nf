@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-include { CHECKM2 } from '../modules/qc.nf'
+include { CHECKM2 
+          FASTANI } from '../modules/qc.nf'
 
 workflow QC {
 
@@ -8,6 +9,8 @@ workflow QC {
     assembly_ch
 
     main:
+    FASTANI(assembly_ch)
+
     checkm2_db = Channel.value(file(params.checkm2_db, checkIfExists: true))
 
     checkm2_ch = assembly_ch

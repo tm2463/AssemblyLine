@@ -1,5 +1,6 @@
 process FASTP {
     // https://github.com/opengene/fastp
+    tag "${ID}"
     label 'medium'
 
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
@@ -8,7 +9,7 @@ process FASTP {
     tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path(out1), path(out2), val(size), path("${ID}.json"), emit: fastp
+    tuple val(ID), path("${ID}_1_fastp.fq.gz"), path("${ID}_2_fastp.fq.gz"), val(size), path("${ID}.json"), emit: fastp
 
     script:
     def R1="${reads[0]}"
@@ -22,6 +23,7 @@ process FASTP {
 
 process FASTPLONG {
     // https://github.com/OpenGene/fastplong/
+    tag "${ID}"
     label 'medium'
 
     container "quay.io/biocontainers/fastplong:0.4.1--h224cc79_0"
@@ -46,6 +48,7 @@ process FILTER_FASTP {
     // Minimum sequence depth = 30x
     // Lower assembly length limit = 5.5Mbp
     // Total base count = 165Mbp
+    tag "${ID}"
     label 'small'
 
     input:

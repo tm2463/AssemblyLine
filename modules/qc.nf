@@ -2,7 +2,7 @@ process CHECKM2 {
     // https://github.com/chklovski/CheckM2
     label 'medium'
 
-    publishDir "${params.outdir}/qc"
+    publishDir "${params.outdir}"
 
     container "quay.io/biocontainers/checkm2:1.1.0--pyh7e72e81_1"
 
@@ -17,5 +17,26 @@ process CHECKM2 {
     """
     checkm2 predict --input fastas --output-directory checkm2 --threads ${task.cpus} -x .fa --database_path ${checkm2_db}
     mv checkm2/quality_report.tsv checkm2_report.tsv
+    """
+}
+
+process FASTANI {
+    // https://github.com/ParBLiSS/FastANI
+    tag "${ID}"
+    label 'medium'
+
+    publishDir "${params.outdir}/${ID}"
+
+    container "quay.io/biocontainers/fastani:1.34--hb66fcc3_7"
+
+    input:
+    tuple val(ID), path(fasta), path(ref)
+
+    output:
+    tuple val(ID), path("${ID}.out")
+
+    script:
+    """
+    fastANI -q ${fasta} -r ${ref} -o ${ID}.out
     """
 }
