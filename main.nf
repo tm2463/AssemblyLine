@@ -23,7 +23,8 @@ workflow {
 
     def assembly_ch
     if (!params.skip_preprocessing) {
-        assembly_ch = PREPROCESSING(input_ch)
+        PREPROCESSING(input_ch)
+        assembly_ch = PREPROCESSING.out.preprocessed_ch
     } else {
         assembly_ch = input_ch
     }

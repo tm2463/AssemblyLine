@@ -9,7 +9,9 @@ workflow QC {
     assembly_ch
 
     main:
-    FASTANI(assembly_ch)
+    ref_ch = Channel.value(file(params.reference, checkIfExists: true))
+    
+    FASTANI(assembly_ch, ref_ch)
 
     checkm2_db = Channel.value(file(params.checkm2_db, checkIfExists: true))
 
