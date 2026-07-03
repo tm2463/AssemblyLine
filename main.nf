@@ -7,7 +7,6 @@ include { printHelp
 
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
 include { ASSEMBLY } from './subworkflows/assembly.nf'
-include { QC } from './subworkflows/qc.nf'
 include { ANNOTATION } from './subworkflows/annotation.nf'
 
 workflow {
@@ -31,6 +30,6 @@ workflow {
     }
 
     ASSEMBLY(assembly_ch)
-    | ( QC & ANNOTATION )
+    | ANNOTATION
 
 }

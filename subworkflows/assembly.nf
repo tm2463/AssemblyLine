@@ -3,7 +3,10 @@
 include { SHOVILL 
           DRAGONFLYE 
           MAKE_UNIQUE_READ_IDS } from '../modules/assembly.nf'
-include { QUAST } from '../modules/quast.nf'
+include { QUAST 
+          QUAST_SUMMARY } from '../modules/quast.nf'
+include { CHECKM2 } from '../modules/checkm2.nf'
+include { FASTANI } from '../modules/fastani.nf'
 
 workflow ASSEMBLY {
 
@@ -11,17 +14,34 @@ workflow ASSEMBLY {
     assembly_ch
 
     main:
+    def qc_ch
     if (params.mode == "short") {
         SHOVILL(assembly_ch)
-        contigs = SHOVILL.out
+        qc_ch = SHOVILL.out
     } else {
         MAKE_UNIQUE_READ_IDS(assembly_ch)
         | DRAGONFLYE
-        contigs = DRAGONFLYE.out
+        qc_ch = DRAGONFLYE.out
     }
+    
+    qc_ch
+        .multiMap { it ->
+            quast: it
+            checkm2: it
+            fastani: it
+        }
+        .set { split_ch }
 
-    QUAST(contigs)
-    contigs_ch = QUAST.out.results
+    QUAST(split_ch.quast)
+    | QUAST_SUMMARY
+
+    ref_ch = Channel.value(file(params.reference, checkIfExists: true))
+    FASTANI(split_ch.fastani, ref_ch)
+
+    checkm2_db = Channel.value(file(params.checkm2_db, checkIfExists: true))
+    CHECKM2(split_ch.checkm2, checkm2_db)
+
+    def contigs_ch
 
     emit:
     contigs_ch
