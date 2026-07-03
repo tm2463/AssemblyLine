@@ -3,6 +3,7 @@
 include { SHOVILL 
           DRAGONFLYE 
           MAKE_UNIQUE_READ_IDS } from '../modules/assembly.nf'
+include { QUAST } from '../modules/quast.nf'
 
 workflow ASSEMBLY {
 
@@ -19,7 +20,8 @@ workflow ASSEMBLY {
         contigs = DRAGONFLYE.out
     }
 
-    contigs_ch = contigs
+    QUAST(contigs)
+    contigs_ch = QUAST.out.results
 
     emit:
     contigs_ch

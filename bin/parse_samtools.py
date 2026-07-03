@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import sys
 
-stats_file = sys.argv[1]
-threshold  = float(sys.argv[2]) if len(sys.argv) > 2 else 0.8
+ID = sys.argv[1]
+stats_file = sys.argv[2]
+threshold  = float(sys.argv[3]) if len(sys.argv) > 3 else 0.8
 
 total, mapped = None, None
 
@@ -21,5 +22,11 @@ if total == 0:
     sys.exit("ERROR: total reads is 0")
 
 pct = mapped / total
-result = "PASS" if pct >= threshold else "FAIL"
-print(result)
+
+if pct >= threshold:
+    print("PASS")
+else:
+    print("FAIL")
+    with open(f"{ID}.fail", "w") as f:
+        f.write(f"{ID} failed mapping filter: mapped reads ({mapped}) / total reads ({total}) = {pct:.2f} < threshold ({threshold})\n")
+

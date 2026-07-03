@@ -48,15 +48,18 @@ process FILTER_SAMTOOLS {
     tag "${ID}"
     label 'small'
 
+    publishDir "${params.outdir}/failed_samples", pattern: "${ID}.fail"
+
     input:
     tuple val(ID), path(reads), val(size), path(sn_stats)
 
     output:
     tuple val(ID), path(reads), val(size), stdout, emit: samtools_out
+    path("${ID}.fail"), optional: true
 
     script:
     def command="${projectDir}/bin/parse_samtools.py"
     """
-    ${command} ${sn_stats} ${params.min_mapping_rate}
+    ${command} ${ID} ${sn_stats} ${params.min_mapping_rate}
     """
 }
