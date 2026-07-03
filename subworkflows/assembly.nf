@@ -32,6 +32,9 @@ workflow ASSEMBLY {
         }
         .set { split_ch }
 
+    // chain these up and filter each sample
+    // merge all tool outputs into one QC file
+
     QUAST(split_ch.quast)
     | QUAST_SUMMARY
 
