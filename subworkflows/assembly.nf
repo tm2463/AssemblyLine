@@ -49,6 +49,9 @@ workflow ASSEMBLY {
 
     REPORT(report_ch)
 
+    // TODO: add pass_fail to reporting script, and merge report to publish
+    // Also need to add reporting to preprocessing, pass/fail already handled, just need to collect reports
+
     emit:
     report_ch
 

@@ -4,8 +4,6 @@ process REPORT {
 
     container 'quay.io/biocontainers/pandas:2.2.1'
 
-    publishDir "${params.outdir}/${ID}", pattern: "*_report.tsv"
-
     input:
     tuple val(ID), path(fasta), path(quast), path(fastani), path(checkm2)
 

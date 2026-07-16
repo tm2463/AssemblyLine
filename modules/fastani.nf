@@ -3,8 +3,6 @@ process FASTANI {
     tag "${ID}"
     label 'small'
 
-    publishDir "${params.outdir}/${ID}"
-
     container "quay.io/biocontainers/fastani:1.34--hb66fcc3_7"
 
     input:

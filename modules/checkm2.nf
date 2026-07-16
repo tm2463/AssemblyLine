@@ -3,8 +3,6 @@ process CHECKM2 {
     tag "${ID}"
     label 'medium'
 
-    publishDir "${params.outdir}"
-
     container "quay.io/biocontainers/checkm2:1.1.0--pyh7e72e81_1"
 
     input:
