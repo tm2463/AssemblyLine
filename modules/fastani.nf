@@ -12,7 +12,7 @@ process FASTANI {
     path(ref)
 
     output:
-    tuple val(ID), path("${ID}.out")
+    tuple val(ID), path("${ID}.out"), emit: fastani_out
 
     script:
     """

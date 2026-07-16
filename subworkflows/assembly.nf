@@ -7,6 +7,7 @@ include { QUAST
           QUAST_SUMMARY } from '../modules/quast.nf'
 include { CHECKM2 } from '../modules/checkm2.nf'
 include { FASTANI } from '../modules/fastani.nf'
+include { REPORT } from '../modules/report.nf'
 
 workflow ASSEMBLY {
 
@@ -32,9 +33,6 @@ workflow ASSEMBLY {
         }
         .set { split_ch }
 
-    // chain these up and filter each sample
-    // merge all tool outputs into one QC file
-
     QUAST(split_ch.quast)
     | QUAST_SUMMARY
 
@@ -44,8 +42,14 @@ workflow ASSEMBLY {
     checkm2_db = Channel.value(file(params.checkm2_db, checkIfExists: true))
     CHECKM2(split_ch.checkm2, checkm2_db)
 
-    def contigs_ch
+    report_ch = qc_ch
+        .join(QUAST_SUMMARY.out.quast_out)
+        .join(FASTANI.out.fastani_out)
+        .join(CHECKM2.out.checkm2_out)
+
+    REPORT(report_ch)
 
     emit:
-    contigs_ch
+    report_ch
+
 }
