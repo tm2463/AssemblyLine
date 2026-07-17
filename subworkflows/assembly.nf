@@ -3,11 +3,11 @@
 include { SHOVILL 
           DRAGONFLYE 
           MAKE_UNIQUE_READ_IDS } from '../modules/assembly.nf'
-include { QUAST 
-          QUAST_SUMMARY } from '../modules/quast.nf'
+include { QUAST } from '../modules/quast.nf'
 include { CHECKM2 } from '../modules/checkm2.nf'
 include { FASTANI } from '../modules/fastani.nf'
-include { REPORT } from '../modules/report.nf'
+include { COLLECT_REPORTS 
+          MERGE_REPORTS } from '../modules/reporting.nf'
 
 workflow ASSEMBLY {
 
@@ -34,7 +34,6 @@ workflow ASSEMBLY {
         .set { split_ch }
 
     QUAST(split_ch.quast)
-    | QUAST_SUMMARY
 
     ref_ch = Channel.value(file(params.reference, checkIfExists: true))
     FASTANI(split_ch.fastani, ref_ch)
@@ -43,16 +42,21 @@ workflow ASSEMBLY {
     CHECKM2(split_ch.checkm2, checkm2_db)
 
     report_ch = qc_ch
-        .join(QUAST_SUMMARY.out.quast_out)
+        .join(QUAST.out.quast_out)
         .join(FASTANI.out.fastani_out)
         .join(CHECKM2.out.checkm2_out)
 
-    REPORT(report_ch)
+    COLLECT_REPORTS(report_ch)
 
-    // TODO: add pass_fail to reporting script, and merge report to publish
-    // Also need to add reporting to preprocessing, pass/fail already handled, just need to collect reports
+    merge_ch = COLLECT_REPORTS.out.report.collect()
+    MERGE_REPORTS(merge_ch)
+
+    COLLECT_REPORTS.out.contigs
+        | filter { it -> it[2].trim() == 'PASS' }
+        | map { it -> it[0..1] }
+        | set { contigs_ch }
 
     emit:
-    report_ch
+    contigs_ch
 
 }

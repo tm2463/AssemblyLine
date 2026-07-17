@@ -9,34 +9,12 @@ process QUAST {
     tuple val(ID), path(fasta)
 
     output:
-    tuple val(ID), path("${ID}_quast_report.tsv")
+    tuple val(ID), path("${ID}_quast_report.tsv"), emit: quast_out
 
     script:
     quast_report = "${ID}_quast_report.tsv"
     """
     quast.py ${fasta} -o quast --no-html --no-plots
     mv quast/transposed_report.tsv ${quast_report}
-    """
-}
-
-process QUAST_SUMMARY {
-    tag "${ID}"
-    label 'small'
-
-    container 'quay.io/biocontainers/pandas:2.2.1'
-
-    input:
-    tuple val(ID), path(quast_report)
-
-    output:
-    tuple val(ID), path("${ID}_quast_summary.tsv"), emit: quast_out
-
-    script:
-    def command="${projectDir}/bin/quast_summary.py"
-    def report_tsv="${ID}_quast_summary.tsv"
-    """
-    ${command} \\
-        --input ${quast_report} \\
-        --output ${report_tsv}
     """
 }

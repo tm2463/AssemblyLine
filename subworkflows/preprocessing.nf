@@ -37,9 +37,9 @@ workflow PREPROCESSING {
         | SYLPH_TAX
 
     SYLPH_TAX.out.sylph_tax
-    | filter { it -> it[4].trim() == 'PASS' }
-    | map { it -> it[0..2] }
-    | set { mapping_ch }
+        | filter { it -> it[4].trim() == 'PASS' }
+        | map { it -> it[0..2] }
+        | set { mapping_ch }
 
     if (params.mode == 'short') {
         ref_ch = Channel.value(file(params.reference, checkIfExists: true))
