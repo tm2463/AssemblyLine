@@ -19,11 +19,9 @@ workflow PREPROCESSING {
     if (params.mode == 'short') {
         FASTP(input_ch)
         sylph_ch = FASTP.out.fastp
-            | map { ID, R1, R2, size, json -> tuple(ID, [R1, R2], size) }
     } else if (params.mode == 'long') {
         FASTPLONG(input_ch)
         sylph_ch = FASTPLONG.out.fastplong
-            | map { ID, fastq, size, json -> tuple(ID, [fastq], size) }
     }
 
     // FILTER_FASTP(sylph_ch)

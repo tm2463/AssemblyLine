@@ -11,7 +11,7 @@ process FASTP {
     tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path("${ID}_1_fastp.fq.gz"), path("${ID}_2_fastp.fq.gz"), val(size), path("${ID}.json"), emit: fastp
+    tuple val(ID), path("${ID}_{1,2}_fastp.fq.gz"), val(size), emit: fastp
 
     script:
     def R1="${reads[0]}"
@@ -36,7 +36,7 @@ process FASTPLONG {
     tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path("${ID}_fastplong.fq.gz"), val(size), path("${ID}.json"), emit: fastplong
+    tuple val(ID), path("${ID}_fastplong.fq.gz", arity: '1..*'), val(size), emit: fastplong
 
     script:
     def fastq="${reads[0]}"
