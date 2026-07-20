@@ -74,33 +74,29 @@ def validateManifest() {
 }
 
 def setInputChannel() {
-    input_ch = Channel
+    def rows = Channel
         .fromPath(params.input)
         .splitCsv(header: true)
 
-    if (params.mode == 'short') {
-        input_ch = input_ch.map { row ->
-            def ID = row.ID
-            def R1 = file(row.R1, checkIfExists: true)
-            def R2 = file(row.R2, checkIfExists: true)
-            tuple(ID, [R1, R2], null)
-        }
-    } else if (params.mode == 'long') {
-        input_ch = input_ch.map { row ->
-            def ID = row.ID
-            def long_fastq = file(row.long_fastq, checkIfExists: true)
-            def genome_size = row.genome_size ? row.genome_size.toInteger() : null
-            tuple(ID, [long_fastq], genome_size)
-        }
-    } else if (params.mode == 'hybrid') {
-        input_ch = input_ch.map { row ->
-            def ID = row.ID
-            def R1 = file(row.R1, checkIfExists: true)
-            def R2 = file(row.R2, checkIfExists: true)
-            def long_fastq = file(row.long_fastq, checkIfExists: true)
-            def genome_size = row.genome_size ? row.genome_size.toInteger() : null
-            tuple(ID, [R1, R2, long_fastq], genome_size)
-        }
+    def asFile    = { path -> file(path, checkIfExists: true) }
+    def parseSize = { row  -> row.genome_size ? row.genome_size.toInteger() : null }
+
+    switch (params.mode) {
+        case 'short':
+            return rows.map { row ->
+                tuple(row.ID, [asFile(row.R1), asFile(row.R2)], null)
+            }
+        case 'long':
+            return rows.map { row ->
+                tuple(row.ID, [asFile(row.long_fastq)], parseSize(row))
+            }
+        case 'hybrid':
+            return rows.multiMap { row ->
+                def size = parseSize(row)
+                short_reads: tuple(row.ID, [asFile(row.R1), asFile(row.R2)], size)
+                long_reads:  tuple(row.ID, [asFile(row.long_fastq)], size)
+            }
+        default:
+            error "Unknown params.mode: ${params.mode}"
     }
-    return input_ch
 }

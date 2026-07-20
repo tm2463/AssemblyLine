@@ -16,12 +16,24 @@ workflow PREPROCESSING {
 
     main:
     def sylph_ch
+
     if (params.mode == 'short') {
         FASTP(input_ch)
         sylph_ch = FASTP.out.fastp
+
     } else if (params.mode == 'long') {
         FASTPLONG(input_ch)
         sylph_ch = FASTPLONG.out.fastplong
+
+    } else if (params.mode == 'hybrid') {
+        FASTP(input_ch.short_reads)
+        FASTPLONG(input_ch.long_reads)
+
+        sylph_ch = FASTP.out.fastp
+            | join(FASTPLONG.out.fastplong, by: 0)
+            | map { ID, short_reads, size, long_reads, size2 ->
+                tuple(ID, short_reads + long_reads, size)
+            }
     }
 
     // FILTER_FASTP(sylph_ch)
