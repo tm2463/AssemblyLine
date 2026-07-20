@@ -61,7 +61,7 @@ def validateManifest() {
     def requiredHeaders = [
         short:  ['ID', 'R1', 'R2'],
         long:   ['ID', 'long_fastq', 'genome_size'],
-        hybrid: ['ID', 'R1', 'R2', 'long_fastq']
+        hybrid: ['ID', 'R1', 'R2', 'long_fastq', 'genome_size']
     ]
 
     def headers = manifestFile.readLines().first().split(',')*.trim()
