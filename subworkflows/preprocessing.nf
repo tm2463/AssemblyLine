@@ -26,6 +26,11 @@ workflow PREPROCESSING {
             | map { ID, fastq, size, json -> tuple(ID, [fastq], size) }
     }
 
+    // FILTER_FASTP(sylph_ch)
+    // | filter { it -> it[3].trim() == 'PASS' }
+    // | map { it -> it[0..2] }
+    // | set { fastp_out_ch }
+
     sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))
     
     SYLPH(sylph_ch, sylph_db_ch)
