@@ -45,3 +45,25 @@ process FASTPLONG {
     fastplong --thread ${task.cpus} -i ${fastq} -o ${out} -j ${ID}.json
     """ 
 }
+
+process FILTER_FASTP {
+    // THIS PROCESS IS CURRENTLY UNUSED BUT MAY BE RE-INTRODUCED ALONGSIDE COMMAND SCRIPT IF NEEDED
+    // https://pmc.ncbi.nlm.nih.gov/articles/PMC3139241/
+    // Total base count >= minimum sequence depth * lower assembly length limit
+    // Minimum sequence depth = 30x
+    // Lower assembly length limit = 5.5Mbp
+    // Total base count = 165Mbp
+    label 'small'
+
+    input:
+    tuple val(ID), path(reads), val(size), path(fastp_json)
+
+    output:
+    tuple val(ID), path(reads), val(size), stdout, emit: fastp_out
+
+    script:
+    def command="${projectDir}/bin/pass_fail_fastp.py"
+    """
+    ${command} ${ID} ${fastp_json} ${params.min_depth} ${params.lower_assembly_length}
+    """
+}
