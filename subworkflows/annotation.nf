@@ -25,6 +25,4 @@ workflow ANNOTATION {
     BAKTA(split_ch.bakta, bakta_db_ch)
     ABRICATE(split_ch.abricate)
 
-    // emit:
-    // ANNOTATION.out.annotation_ch
 }
