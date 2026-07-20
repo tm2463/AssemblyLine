@@ -1,10 +1,9 @@
 process SYLPH {
     // https://github.com/bluenote-1577/sylph
+    tag "${ID}"
     label 'medium'
 
     container "quay.io/biocontainers/sylph:0.9.0--ha6fb395_0"
-
-    publishDir "${params.outdir}/sylph/${ID}", pattern: '*_sylph_profile.tsv'
 
     input:
     tuple val(ID), path(reads), val(genome_size)
@@ -46,10 +45,12 @@ process SYLPH_TAX_FILE {
 
 process SYLPH_TAX {
     // https://www.nature.com/articles/s41467-021-24128-2
-    // At least 95% ANI, 98% sequence abundance and at least (30 | ${params.min_depth}) effective coverage
+    // At least 98% sequence abundance
+    tag "${ID}"
     label 'small'
 
-    publishDir "${params.outdir}/sylph/${ID}", pattern: '*.sylphmpa'
+    publishDir "${params.outdir}/${ID}", pattern: '*.sylphmpa'
+    publishDir "${params.outdir}/failed_samples", pattern: "${ID}.fail"
 
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
@@ -57,14 +58,21 @@ process SYLPH_TAX {
     tuple val(ID), path(reads), val(genome_size), path(sylph_profile), path(tax_file)
 
     output:
-    tuple val(ID), path(reads), val(genome_size), path("*.sylphmpa"), stdout
+    tuple val(ID), path(reads), val(genome_size), path("*.sylphmpa"), stdout, emit: sylph_tax
+    path("${ID}.fail"), optional: true
 
     script:
-    def filter = "\$2 > 98 && \$3 > 98 && \$4 > 95 && \$5 > ${params.min_depth}"
+    def filter = "\$2 > 98 && \$3 > 98 && \$5 > ${params.min_depth}"
     """
     sylph-tax taxprof ${sylph_profile} -t ${tax_file} 1>&2
 
-    awk 'NF' ${ID}*.sylphmpa | tail -n 1 \
-        | awk -F'\t' '${filter} {found=1} END {print (found ? "PASS" : "FAIL")}'
+    RESULT=\$(awk 'NF' ${ID}*.sylphmpa | tail -n 1 \
+        | awk -F'\t' '${filter} {found=1} END {print (found ? "PASS" : "FAIL")}')
+
+    if [ "\${RESULT}" == "FAIL" ]; then
+        echo "${ID} failed sylph-tax filter: no row met sequence abundance > 98 or coverage > ${params.min_depth}" > ${ID}.fail
+    fi
+
+    printf '%s' "\${RESULT}"
     """
 }

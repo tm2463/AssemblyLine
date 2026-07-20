@@ -7,30 +7,29 @@ Usage:
 
 Required:
     --input                             Path to input manifest (columns: ID, R1, R2)
+    --reference                         Path to reference genome for QC stages
+    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
+    --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
+    --bakta_db                          Path to bakta database (e.g. /path/to/database)
 
 Modes:
-    --skip_preprocessing                Skip preprocessing step (default: false)
     --mode                              Options: short, long, hybrid (default: short)
+    --skip_preprocessing                Skip preprocessing step (default: false)
+
+Other Options:
+    --min_depth                         Minimum read coverage (default: 30)
+    --lower_assembly_length             Lower bound for the target assembly length (default: 5500000)
+    --target_genome_size                Assembly QC fails if genome size ±20% of target size (default: 6250000)
+    --min_mapping_rate                  Threshold proportion of reads needing to map to reference during QC (default: 0.8)
+    --min_contig_length                 Min contig length to be included in final assembly (default: 500)
+    --ref_ani                           Threshold ANI percentage for final assembly compared to reference (default: 95)
+    --completeness                      Threshold CheckM2 completeness score to pass QC (default: 99)
+    --contamination                     Threshold CheckM2 contamination score to pass QC (default: 5)
+    --target_gc_content                 Assembly QC fails if genome GC content ±10% of target amount (default: 0.66)
 
 Optional:
     --help                              Show this help message
-
-Fastp:
-    --min_depth                         Default: 30
-    --lower_assembly_length             Default: 5500000
-
-Sylph:
-    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
     --sylph_taxonomy                    Sylph taxonomy label (Default: gtdb_r232)
-
-Assembly:
-    --min_contig_length                 Default: 500
-
-QC:
-    --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
-
-Annotation:
-    --bakta_db                          Path to bakta database (e.g. /path/to/database)
 """
 }
 
@@ -62,7 +61,7 @@ def validateManifest() {
     def requiredHeaders = [
         short:  ['ID', 'R1', 'R2'],
         long:   ['ID', 'long_fastq', 'genome_size'],
-        hybrid: ['ID', 'R1', 'R2', 'long_fastq']
+        hybrid: ['ID', 'R1', 'R2', 'long_fastq', 'genome_size']
     ]
 
     def headers = manifestFile.readLines().first().split(',')*.trim()

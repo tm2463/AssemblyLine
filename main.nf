@@ -7,7 +7,6 @@ include { printHelp
 
 include { PREPROCESSING } from './subworkflows/preprocessing.nf'
 include { ASSEMBLY } from './subworkflows/assembly.nf'
-include { QC } from './subworkflows/qc.nf'
 include { ANNOTATION } from './subworkflows/annotation.nf'
 
 workflow {
@@ -16,6 +15,7 @@ workflow {
         printHelp()
         exit 0
     }
+
     validateParams()
     validateManifest()
 
@@ -23,12 +23,13 @@ workflow {
 
     def assembly_ch
     if (!params.skip_preprocessing) {
-        assembly_ch = PREPROCESSING(input_ch)
+        PREPROCESSING(input_ch)
+        assembly_ch = PREPROCESSING.out.preprocessed_ch
     } else {
         assembly_ch = input_ch
     }
 
     ASSEMBLY(assembly_ch)
-    | ( QC & ANNOTATION )
+    | ANNOTATION
 
 }

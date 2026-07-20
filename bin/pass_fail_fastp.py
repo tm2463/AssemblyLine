@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""This script is currently unused but may be required if more robust read depth calculation is needed"""
+
 import json
 import sys
 

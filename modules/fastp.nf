@@ -1,14 +1,17 @@
 process FASTP {
     // https://github.com/opengene/fastp
+    tag "${ID}"
     label 'medium'
 
     container "quay.io/biocontainers/fastp:1.3.3--h43da1c4_0"
+
+    publishDir "${params.outdir}/fastp", pattern: "${ID}.json"
 
     input:
     tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path(out1), path(out2), val(size), path("${ID}.json"), emit: fastp
+    tuple val(ID), path("${ID}_1_fastp.fq.gz"), path("${ID}_2_fastp.fq.gz"), val(size), path("${ID}.json"), emit: fastp
 
     script:
     def R1="${reads[0]}"
@@ -22,9 +25,12 @@ process FASTP {
 
 process FASTPLONG {
     // https://github.com/OpenGene/fastplong/
+    tag "${ID}"
     label 'medium'
 
     container "quay.io/biocontainers/fastplong:0.4.1--h224cc79_0"
+
+    publishDir "${params.outdir}/fastplong", pattern: "${ID}.json"
 
     input:
     tuple val(ID), path(reads), val(size)
@@ -41,6 +47,7 @@ process FASTPLONG {
 }
 
 process FILTER_FASTP {
+    // THIS PROCESS IS CURRENTLY UNUSED BUT MAY BE RE-INTRODUCED ALONGSIDE COMMAND SCRIPT IF NEEDED
     // https://pmc.ncbi.nlm.nih.gov/articles/PMC3139241/
     // Total base count >= minimum sequence depth * lower assembly length limit
     // Minimum sequence depth = 30x

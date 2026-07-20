@@ -15,12 +15,14 @@ workflow ANNOTATION {
         .multiMap { it ->
             bakta: it
             abricate: it
+            // DefenceFinder (https://github.com/mdmparis/defense-finder) -> CRISPRCasFinder
+            // GECCO / antiSMASH -> biosynthetic gene clusters (https://zellerlab.github.io/tools/gecco)
+            // Mobile Genetic Elements (sequence indexes?)
+            // MLST
         }
         .set { split_ch }
 
     BAKTA(split_ch.bakta, bakta_db_ch)
     ABRICATE(split_ch.abricate)
 
-    // emit:
-    // ANNOTATION.out.annotation_ch
 }
