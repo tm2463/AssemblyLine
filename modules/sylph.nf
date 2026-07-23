@@ -18,11 +18,15 @@ process SYLPH {
         R1="${reads[0]}"
         R2="${reads[1]}"
         sylph sketch -t ${task.cpus} -1 \$R1 -2 \$R2 -d ${ID}_sketch
-    fi
-
-    if [[ "${params.mode}" == "long" ]]; then
-        fastq="${reads[0]}"
-        sylph sketch -t ${task.cpus} -d ${ID}_sketch \$fastq
+    elif [[ "${params.mode}" == "long" ]]; then
+        long_fastq="${reads[0]}"
+        sylph sketch -t ${task.cpus} -d ${ID}_sketch \$long_fastq
+    elif [[ "${params.mode}" == "hybrid" ]]; then
+        R1="${reads[0]}"
+        R2="${reads[1]}"
+        long_fastq="${reads[0]}"
+        sylph sketch -t ${task.cpus} -1 \$R1 -2 \$R2 -d ${ID}_sketch
+        sylph sketch -t ${task.cpus} -d ${ID}_sketch \$long_fastq
     fi
 
     sylph profile -t ${task.cpus} ${sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv
@@ -62,12 +66,14 @@ process SYLPH_TAX {
     path("${ID}.fail"), optional: true
 
     script:
-    def filter = "\$2 > 98 && \$3 > 98 && \$5 > ${params.min_depth}"
+    def short_long_filter = "\$2 > 98 && \$3 > 98 && \$5 > ${params.min_depth}"
+    def hybrid_filter = "\$2 > 196 && \$3 > 98 && \$5 > ${params.min_depth}"
+    def selected_filter = params.mode == 'hybrid' ? hybrid_filter : short_long_filter
     """
     sylph-tax taxprof ${sylph_profile} -t ${tax_file} 1>&2
 
     RESULT=\$(awk 'NF' ${ID}*.sylphmpa | tail -n 1 \
-        | awk -F'\t' '${filter} {found=1} END {print (found ? "PASS" : "FAIL")}')
+        | awk -F'\t' '${selected_filter} {found=1} END {print (found ? "PASS" : "FAIL")}')
 
     if [ "\${RESULT}" == "FAIL" ]; then
         echo "${ID} failed sylph-tax filter: no row met sequence abundance > 98 or coverage > ${params.min_depth}" > ${ID}.fail

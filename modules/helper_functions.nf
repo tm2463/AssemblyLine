@@ -91,10 +91,8 @@ def setInputChannel() {
                 tuple(row.ID, [asFile(row.long_fastq)], parseSize(row))
             }
         case 'hybrid':
-            return rows.multiMap { row ->
-                def size = parseSize(row)
-                short_reads: tuple(row.ID, [asFile(row.R1), asFile(row.R2)], size)
-                long_reads:  tuple(row.ID, [asFile(row.long_fastq)], size)
+            return rows.map { row ->
+                short_reads: tuple(row.ID, [asFile(row.R1), asFile(row.R2), asFile(row.long_fastq)], parseSize(row))
             }
         default:
             error "Unknown params.mode: ${params.mode}"

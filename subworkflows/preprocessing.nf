@@ -26,8 +26,8 @@ workflow PREPROCESSING {
         sylph_ch = FASTPLONG.out.fastplong
 
     } else if (params.mode == 'hybrid') {
-        FASTP(input_ch.short_reads)
-        FASTPLONG(input_ch.long_reads)
+        FASTP(input_ch.map { ID, reads, size -> tuple(ID, [reads[0], reads[1]], size) })
+        FASTPLONG(input_ch.map { ID, reads, size -> tuple(ID, [reads[2]], size) })
 
         sylph_ch = FASTP.out.fastp
             | join(FASTPLONG.out.fastplong, by: 0)
@@ -66,7 +66,7 @@ workflow PREPROCESSING {
         | filter { it -> it[3].trim() == 'PASS' }
         | map { it -> it[0..2] }
         | set { preprocessed_ch }
-    } else if (params.mode == 'long') {
+    } else {
         preprocessed_ch = mapping_ch
     }
 

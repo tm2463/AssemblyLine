@@ -12,6 +12,7 @@ process FASTP {
 
     output:
     tuple val(ID), path("${ID}_{1,2}_fastp.fq.gz"), val(size), emit: fastp
+    path("${ID}.json"), emit: json
 
     script:
     def R1="${reads[0]}"
@@ -37,6 +38,7 @@ process FASTPLONG {
 
     output:
     tuple val(ID), path("${ID}_fastplong.fq.gz", arity: '1..*'), val(size), emit: fastplong
+    path("${ID}.json"), emit: json
 
     script:
     def fastq="${reads[0]}"

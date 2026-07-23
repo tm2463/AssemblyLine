@@ -13,3 +13,11 @@ mkdir long_read && cd long_read
 wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR173/ERR17322606/barcode10.filtered.fastq.gz
 wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR173/ERR17322597/barcode01.filtered.fastq.gz
 wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR173/ERR17322608/barcode12.filtered.fastq.gz
+
+# hybrid reads require sra-tools (https://github.com/ncbi/sra-tools)
+cd ../
+mkdir hybrid_read && cd hybrid_read
+prefetch SRR30916324 # Illumina reads
+prefetch SRR30916323 # ONT reads
+fasterq-dump SRR30916324 # Illumina reads
+fasterq-dump SRR30916323 # ONT reads
