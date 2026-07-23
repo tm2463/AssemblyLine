@@ -49,6 +49,18 @@ def validateParams() {
         log.error "Error: Invalid value for --mode. Allowed values are 'short', 'long', or 'hybrid'."
         exit 1
     }
+
+    def validShortAssemblers = ["spades", "skesa", "megahit"]
+    if (!(params.short_assembler in validShortAssemblers)) {
+        log.error "Error: Invalid short read assembler, please choose: spades, skesa or megahit"
+        exit 1
+    }
+
+    def validLongAssemblers = ["flye", "raven", "miniasm"]
+    if (!(params.long_assembler in validLongAssemblers)) {
+        log.error "Error: Invalid long read assembler, please choose: flye, raven or miniasm"
+        exit 1
+    }
 }
 
 def validateManifest() {

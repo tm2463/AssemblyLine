@@ -17,7 +17,7 @@ process SHOVILL {
     def R1="${reads[0]}"
     def R2="${reads[1]}"
     """
-    shovill --outdir results --R1 ${R1} --R2 ${R2} --cpus ${task.cpus} --minlen ${params.min_contig_length}
+    shovill --outdir results --R1 ${R1} --R2 ${R2} --cpus ${task.cpus} --minlen ${params.min_contig_length} --assembler ${params.short_assembler}
     mv results/contigs.fa "${ID}_contigs.fa"
     """
 }
@@ -43,7 +43,7 @@ process DRAGONFLYE {
     def prefix = "${ID}_contigs.fa"
     def memory = task.memory.toGiga() - 2
     """
-    dragonflye --outdir results --reads ${fastq} ${genome_size} --ram ${memory}
+    dragonflye --outdir results --reads ${fastq} ${genome_size} --ram ${memory} --assembler ${params.long_assembler}
     mv results/contigs.fa "${prefix}"
     """
 }
