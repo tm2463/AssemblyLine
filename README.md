@@ -79,3 +79,8 @@ For more details on the required databases, please open the following links in a
 - Sylph [link](https://sylph-docs.github.io/pre%E2%80%90built-databases/)
 - CheckM2 [link](https://github.com/chklovski/CheckM2#Databases)
 - Bakta database [link](https://github.com/oschwengers/bakta#database)
+
+### TODO:
+1. Implement functional annotation processes
+2. Remove sylph-tax file download process, adding download link to fetch_databases.sh
+3. Bakta DB requires manually updating in order to be compatible
