@@ -79,5 +79,3 @@ For more details on the required databases, please open the following links in a
 - Sylph [link](https://sylph-docs.github.io/pre%E2%80%90built-databases/)
 - CheckM2 [link](https://github.com/chklovski/CheckM2#Databases)
 - Bakta database [link](https://github.com/oschwengers/bakta#database)
-### Reference Genome
-It is reccommended to provide a reference genome for use in both read QC as well as assembly QC, however this is optional.
