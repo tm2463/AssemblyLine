@@ -32,6 +32,7 @@ Other Options:
 Assembly Options:
     --short_assembler                   Options: spades, skesa, megahit (default: spades)
     --long_assembler                    Options: flye, raven, miniasm (default: flye)
+    --unicycler_mode                    Options: conservative, normal, bold (default: normal)
 
 Optional:
     --help                              Show this help message

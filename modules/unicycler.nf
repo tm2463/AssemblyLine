@@ -19,7 +19,16 @@ process UNICYCLER {
     def long_fastq="${reads[2]}"
     """
     mkdir -p unicycler_output
-    unicycler -1 ${R1} -2 ${R2} -l ${long_fastq} -o unicycler_output -t ${task.cpus}
+
+    unicycler \
+        -1 ${R1} \
+        -2 ${R2} \
+        -l ${long_fastq} \
+        -o unicycler_output \
+        -t ${task.cpus} \
+        --min_fasta_length ${params.min_contig_length} \
+        --mode ${params.unicycler_mode}
+
     mv unicycler_output/assembly.fasta "${ID}_contigs.fa"
     """
 }
