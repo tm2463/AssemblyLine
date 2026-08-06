@@ -1,6 +1,6 @@
 # AssemblyLine
 
-**AssemblyLine** is a best practise bacterial isolate genome assembly pipeline written in Nextflow. It can handle short, long or hybrid read datasets and performs read QC, assembly, assembly QC and annotation.
+AssemblyLine is a best practise bacterial isolate genome assembly pipeline written in Nextflow. It can handle short, long or hybrid read datasets and performs read QC, assembly, assembly QC and annotation.
 
 ## Setup
 
