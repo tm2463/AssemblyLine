@@ -1,8 +1,9 @@
 #!/usr/bin/env nextflow
 
-include { SHOVILL 
-          DRAGONFLYE 
-          MAKE_UNIQUE_READ_IDS } from '../modules/assembly.nf'
+include { SHOVILL } from '../modules/shovill.nf'
+include { DRAGONFLYE 
+          MAKE_UNIQUE_READ_IDS } from '../modules/dragonflye.nf'
+include { UNICYCLER } from '../modules/unicycler.nf'
 include { QUAST } from '../modules/quast.nf'
 include { CHECKM2 } from '../modules/checkm2.nf'
 include { FASTANI } from '../modules/fastani.nf'
@@ -19,10 +20,13 @@ workflow ASSEMBLY {
     if (params.mode == "short") {
         SHOVILL(assembly_ch)
         qc_ch = SHOVILL.out
-    } else {
+    } else if (params.mode == "long") {
         MAKE_UNIQUE_READ_IDS(assembly_ch)
         | DRAGONFLYE
         qc_ch = DRAGONFLYE.out
+    } else if (params.mode == "hybrid") {
+        UNICYCLER(assembly_ch)
+        qc_ch = UNICYCLER.out
     }
     
     qc_ch

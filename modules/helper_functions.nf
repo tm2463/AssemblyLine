@@ -5,9 +5,10 @@ def printHelp() {
 Usage:
     nextflow run main.nf --input manifest.csv [options]
 
+Parameters can be passed via the command line or preferably by editing the 'qc.config' file.
+
 Required:
     --input                             Path to input manifest (columns: ID, R1, R2)
-    --reference                         Path to reference genome for QC stages
     --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
     --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
     --bakta_db                          Path to bakta database (e.g. /path/to/database)
@@ -17,6 +18,7 @@ Modes:
     --skip_preprocessing                Skip preprocessing step (default: false)
 
 Other Options:
+    --reference                         Path to reference genome for QC stages
     --min_depth                         Minimum read coverage (default: 30)
     --lower_assembly_length             Lower bound for the target assembly length (default: 5500000)
     --target_genome_size                Assembly QC fails if genome size ±20% of target size (default: 6250000)
@@ -26,6 +28,11 @@ Other Options:
     --completeness                      Threshold CheckM2 completeness score to pass QC (default: 99)
     --contamination                     Threshold CheckM2 contamination score to pass QC (default: 5)
     --target_gc_content                 Assembly QC fails if genome GC content ±10% of target amount (default: 0.66)
+
+Assembly Options:
+    --short_assembler                   Options: spades, skesa, megahit (default: spades)
+    --long_assembler                    Options: flye, raven, miniasm (default: flye)
+    --unicycler_mode                    Options: conservative, normal, bold (default: normal)
 
 Optional:
     --help                              Show this help message
@@ -49,6 +56,18 @@ def validateParams() {
         log.error "Error: Invalid value for --mode. Allowed values are 'short', 'long', or 'hybrid'."
         exit 1
     }
+
+    def validShortAssemblers = ["spades", "skesa", "megahit"]
+    if (!(params.short_assembler in validShortAssemblers)) {
+        log.error "Error: Invalid short read assembler, please choose: spades, skesa or megahit"
+        exit 1
+    }
+
+    def validLongAssemblers = ["flye", "raven", "miniasm"]
+    if (!(params.long_assembler in validLongAssemblers)) {
+        log.error "Error: Invalid long read assembler, please choose: flye, raven or miniasm"
+        exit 1
+    }
 }
 
 def validateManifest() {
@@ -59,8 +78,8 @@ def validateManifest() {
     }
 
     def requiredHeaders = [
-        short:  ['ID', 'R1', 'R2'],
-        long:   ['ID', 'long_fastq', 'genome_size'],
+        short: ['ID', 'R1', 'R2'],
+        long: ['ID', 'long_fastq', 'genome_size'],
         hybrid: ['ID', 'R1', 'R2', 'long_fastq', 'genome_size']
     ]
 
@@ -74,33 +93,27 @@ def validateManifest() {
 }
 
 def setInputChannel() {
-    input_ch = Channel
+    def rows = Channel
         .fromPath(params.input)
         .splitCsv(header: true)
 
-    if (params.mode == 'short') {
-        input_ch = input_ch.map { row ->
-            def ID = row.ID
-            def R1 = file(row.R1, checkIfExists: true)
-            def R2 = file(row.R2, checkIfExists: true)
-            tuple(ID, [R1, R2], null)
-        }
-    } else if (params.mode == 'long') {
-        input_ch = input_ch.map { row ->
-            def ID = row.ID
-            def long_fastq = file(row.long_fastq, checkIfExists: true)
-            def genome_size = row.genome_size ? row.genome_size.toInteger() : null
-            tuple(ID, [long_fastq], genome_size)
-        }
-    } else if (params.mode == 'hybrid') {
-        input_ch = input_ch.map { row ->
-            def ID = row.ID
-            def R1 = file(row.R1, checkIfExists: true)
-            def R2 = file(row.R2, checkIfExists: true)
-            def long_fastq = file(row.long_fastq, checkIfExists: true)
-            def genome_size = row.genome_size ? row.genome_size.toInteger() : null
-            tuple(ID, [R1, R2, long_fastq], genome_size)
-        }
+    def asFile = { path -> file(path, checkIfExists: true) }
+    def parseSize = { row  -> row.genome_size ? row.genome_size.toInteger() : null }
+
+    switch (params.mode) {
+        case 'short':
+            return rows.map { row ->
+                tuple(row.ID, [asFile(row.R1), asFile(row.R2)], null)
+            }
+        case 'long':
+            return rows.map { row ->
+                tuple(row.ID, [asFile(row.long_fastq)], parseSize(row))
+            }
+        case 'hybrid':
+            return rows.map { row ->
+                short_reads: tuple(row.ID, [asFile(row.R1), asFile(row.R2), asFile(row.long_fastq)], parseSize(row))
+            }
+        default:
+            error "Unknown params.mode: ${params.mode}"
     }
-    return input_ch
 }
