@@ -9,7 +9,6 @@ Parameters can be passed via the command line or preferably by editing the 'qc.c
 
 Required:
     --input                             Path to input manifest (columns: ID, R1, R2)
-    --reference                         Path to reference genome for QC stages
     --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
     --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
     --bakta_db                          Path to bakta database (e.g. /path/to/database)
@@ -19,6 +18,7 @@ Modes:
     --skip_preprocessing                Skip preprocessing step (default: false)
 
 Other Options:
+    --reference                         Path to reference genome for QC stages
     --min_depth                         Minimum read coverage (default: 30)
     --lower_assembly_length             Lower bound for the target assembly length (default: 5500000)
     --target_genome_size                Assembly QC fails if genome size ±20% of target size (default: 6250000)

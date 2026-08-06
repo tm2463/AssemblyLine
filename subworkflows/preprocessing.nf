@@ -56,7 +56,7 @@ workflow PREPROCESSING {
         | map { it -> it[0..2] }
         | set { mapping_ch }
 
-    if (params.mode == 'short') {
+    if (params.mode == 'short' && params.reference) {
         ref_ch = Channel.value(file(params.reference, checkIfExists: true))
         BWA(mapping_ch, ref_ch) 
         | SAMTOOLS
