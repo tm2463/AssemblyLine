@@ -5,6 +5,8 @@ def printHelp() {
 Usage:
     nextflow run main.nf --input manifest.csv [options]
 
+Parameters can be passed via the command line or preferably by editing the 'qc.config' file.
+
 Required:
     --input                             Path to input manifest (columns: ID, R1, R2)
     --reference                         Path to reference genome for QC stages
@@ -26,6 +28,10 @@ Other Options:
     --completeness                      Threshold CheckM2 completeness score to pass QC (default: 99)
     --contamination                     Threshold CheckM2 contamination score to pass QC (default: 5)
     --target_gc_content                 Assembly QC fails if genome GC content ±10% of target amount (default: 0.66)
+
+Assembly Options:
+    --short_assembler                   Options: spades, skesa, megahit (default: spades)
+    --long_assembler                    Options: flye, raven, miniasm (default: flye)
 
 Optional:
     --help                              Show this help message
@@ -71,8 +77,8 @@ def validateManifest() {
     }
 
     def requiredHeaders = [
-        short:  ['ID', 'R1', 'R2'],
-        long:   ['ID', 'long_fastq', 'genome_size'],
+        short: ['ID', 'R1', 'R2'],
+        long: ['ID', 'long_fastq', 'genome_size'],
         hybrid: ['ID', 'R1', 'R2', 'long_fastq', 'genome_size']
     ]
 
@@ -90,7 +96,7 @@ def setInputChannel() {
         .fromPath(params.input)
         .splitCsv(header: true)
 
-    def asFile    = { path -> file(path, checkIfExists: true) }
+    def asFile = { path -> file(path, checkIfExists: true) }
     def parseSize = { row  -> row.genome_size ? row.genome_size.toInteger() : null }
 
     switch (params.mode) {
