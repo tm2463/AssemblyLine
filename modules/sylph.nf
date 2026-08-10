@@ -33,20 +33,6 @@ process SYLPH {
     """
 }
 
-process SYLPH_TAX_FILE {
-    label 'small'
-
-    container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
-
-    output:
-    path("${params.sylph_taxonomy}_metadata.tsv.gz"), emit: tax
-
-    script:
-    """
-    sylph-tax download --download-to .
-    """
-}
-
 process SYLPH_TAX {
     // https://www.nature.com/articles/s41467-021-24128-2
     // At least 98% sequence abundance
@@ -59,13 +45,16 @@ process SYLPH_TAX {
     container "quay.io/biocontainers/sylph-tax:1.9.0--pyhdfd78af_0"
 
     input:
-    tuple val(ID), path(reads), val(genome_size), path(sylph_profile), path(tax_file)
+    tuple val(ID), path(reads), val(genome_size), path(sylph_profile)
 
     output:
     tuple val(ID), path(reads), val(genome_size), path("*.sylphmpa"), stdout, emit: sylph_tax
     path("${ID}.fail"), optional: true
 
     script:
+    def tax_file = file(params.sylph_tax_file, checkIfExists: true)
+    // Filtering criteria for sylph-tax: sequence abundance > 98% and coverage > min_depth
+    // Short and long mode share the same filtering criteria, while hybrid mode requires a higher sequence abundance threshold of 196%
     def short_long_filter = "\$2 > 98 && \$3 > 98 && \$5 > ${params.min_depth}"
     def hybrid_filter = "\$2 > 196 && \$3 > 98 && \$5 > ${params.min_depth}"
     def selected_filter = params.mode == 'hybrid' ? hybrid_filter : short_long_filter

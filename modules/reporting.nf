@@ -5,7 +5,7 @@ process COLLECT_REPORTS {
     container 'quay.io/biocontainers/pandas:2.2.1'
 
     input:
-    tuple val(ID), path(fasta), path(quast), path(fastani), path(checkm2)
+    tuple val(ID), path(fasta), path(quast), path(fastani), path(checkm2), path(mlst)
 
     output:
     tuple val(ID), path(fasta), stdout, emit: contigs
@@ -19,6 +19,7 @@ process COLLECT_REPORTS {
         --quast ${quast} \\
         --fastani ${fastani} \\
         --checkm2 ${checkm2} \\
+        --mlst ${mlst} \\
         --target_size ${params.target_genome_size} \\
         --ani ${params.ref_ani} \\
         --completeness ${params.completeness} \\

@@ -40,47 +40,66 @@ There are 3 main subworkflows: **Preprocessing**, **Assembly** and **Annotation*
 1. Reads are annotated using [Bakta](https://github.com/oschwengers/bakta) and [Abricate](https://github.com/tseemann/abricate)
 2. Functional annotations will be perfomed with TDB...
 >**COMING SOON:** The ``--skip_assembly`` flag will allow **AssemblyLine** to run as a pure functional annotation pipeline
+
 ## Options
-You can access all options and parameters by running ``nextflow run <path/to/main.nf> --help``
-```
-Required:
-    --input                             Path to input manifest (columns: ID, R1, R2)
-    --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
-    --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
-    --bakta_db                          Path to bakta database (e.g. /path/to/database)
 
-Modes:
-    --mode                              Options: short, long, hybrid (default: short)
-    --skip_preprocessing                Skip preprocessing step (default: false)
+You can access all options and parameters by running ``nextflow run <path/to/main.nf> --help``. Parameters can be passed via the command line or preferably by editing the `qc.config` file.
 
-Other Options:
-    --reference                         Path to reference genome for QC stages
-    --min_depth                         Minimum read coverage (default: 30)
-    --lower_assembly_length             Lower bound for the target assembly length (default: 5500000)
-    --target_genome_size                Assembly QC fails if genome size ±20% of target size (default: 6250000)
-    --min_mapping_rate                  Threshold proportion of reads needing to map to reference during QC (default: 0.8)
-    --min_contig_length                 Min contig length to be included in final assembly (default: 500)
-    --ref_ani                           Threshold ANI percentage for final assembly compared to reference (default: 95)
-    --completeness                      Threshold CheckM2 completeness score to pass QC (default: 99)
-    --contamination                     Threshold CheckM2 contamination score to pass QC (default: 5)
-    --target_gc_content                 Assembly QC fails if genome GC content ±10% of target amount (default: 0.66)
+### Required
 
-Assembly Options:
-    --short_assembler                   Options: spades, skesa, megahit (default: spades)
-    --long_assembler                    Options: flye, raven, miniasm (default: flye)
-    --unicycler_mode                    Options: conservative, normal, bold (default: normal)
+| Parameter | Description |
+|---|---|
+| `--input` | Path to input manifest (columns: ID, R1, R2) |
+| `--sylph_db` | Path to sylph database (e.g. `/path/to/.sylphdb`) |
+| `--sylph_tax_file` | Path to sylph taxonomy file (e.g. `/path/to/gtdb_r232_metadata.tsv.gz`) |
+| `--checkm2_db` | Path to checkm2 database (e.g. `/path/to/.dmnd`) |
+| `--bakta_db` | Path to bakta database (e.g. `/path/to/database`) |
 
-Optional:
-    --help                              Show this help message
-    --sylph_taxonomy                    Sylph taxonomy label (Default: gtdb_r232)
-```
+### Modes
+
+| Parameter | Description |
+|---|---|
+| `--mode` | Options: `short`, `long`, `hybrid` (default: `short`) |
+| `--skip_preprocessing` | Skip preprocessing step (default: `false`) |
+
+### Other Options
+
+| Parameter | Description |
+|---|---|
+| `--reference` | Path to reference genome for QC stages |
+| `--min_depth` | Minimum read coverage (default: `30`) |
+| `--lower_assembly_length` | Lower bound for the target assembly length (default: `5500000`) |
+| `--target_genome_size` | Assembly QC fails if genome size ±20% of target size (default: `6250000`) |
+| `--min_mapping_rate` | Threshold proportion of reads needing to map to reference during QC (default: `0.8`) |
+| `--min_contig_length` | Min contig length to be included in final assembly (default: `500`) |
+| `--ref_ani` | Threshold ANI percentage for final assembly compared to reference (default: `95`) |
+| `--completeness` | Threshold CheckM2 completeness score to pass QC (default: `99`) |
+| `--contamination` | Threshold CheckM2 contamination score to pass QC (default: `5`) |
+| `--target_gc_content` | Assembly QC fails if genome GC content ±10% of target amount (default: `0.66`) |
+
+### Assembly Options
+
+| Parameter | Description |
+|---|---|
+| `--short_assembler` | Options: `spades`, `skesa`, `megahit` (default: `spades`) |
+| `--long_assembler` | Options: `flye`, `raven`, `miniasm` (default: `flye`) |
+| `--unicycler_mode` | Options: `conservative`, `normal`, `bold` (default: `normal`) |
+
+### Optional
+
+| Parameter | Description |
+|---|---|
+| `--help` | Show this help message |
+| `--sylph_taxonomy` | Sylph taxonomy label (default: `gtdb_r232`) |
+
 ### Databases
+
 For more details on the required databases, please open the following links in a new tab:
 - Sylph [link](https://sylph-docs.github.io/pre%E2%80%90built-databases/)
 - CheckM2 [link](https://github.com/chklovski/CheckM2#Databases)
 - Bakta database [link](https://github.com/oschwengers/bakta#database)
 
 ### TODO:
+
 1. Implement functional annotation processes
-2. Remove sylph-tax file download process, adding download link to fetch_databases.sh
-3. Bakta DB requires manually updating in order to be compatible
+2. Bakta DB requires manually updating in order to be compatible

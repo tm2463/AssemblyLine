@@ -11,7 +11,7 @@ process MLST {
     tuple val(ID), path(contigs)
 
     output:
-    path("${ID}_mlst.tsv"), emit: mlst_out
+    tuple val(ID), path("${ID}_mlst.tsv"), emit: mlst_out
 
     script:
     """

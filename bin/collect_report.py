@@ -14,6 +14,7 @@ def parse_args():
     parser.add_argument("--quast", type=Path, required=True, help="Path to quast summary report")
     parser.add_argument("--fastani", type=Path, required=True, help="Path to fastani report")
     parser.add_argument("--checkm2", type=Path, required=True, help="Path to checkm2 report")
+    parser.add_argument("--mlst", type=Path, required=True, help="Path to mlst report")
 
     parser.add_argument("--target_size", type=int, required=True, help="Target genome size in bp")
     parser.add_argument("--ani", type=float, required=True, help="Reference ANI % threshold (e.g. 95)")
@@ -73,9 +74,15 @@ def main():
     checkm2_df = checkm2_df[["Name", "Completeness", "Contamination", "GC_Content", "Total_Coding_Sequences", "Total_Contigs", "Max_Contig_Length"]]
     checkm2_df = checkm2_df.rename(columns={"Name": "ID"})
 
+    mlst_df = pd.read_csv(args.mlst, sep='\t')
+    mlst_df["FILE"] = mlst_df["FILE"].str.replace(r'\.fa$', '', regex=True)
+    mlst_df = mlst_df[["FILE", "SCHEME", "ST", "ALLELES"]]
+    mlst_df = mlst_df.rename(columns={"FILE": "ID"})
+
     merged_df = quast_df.merge(fastani_df, on="ID", how="outer") \
-                        .merge(checkm2_df, on="ID", how="outer")
-    
+                        .merge(checkm2_df, on="ID", how="outer") \
+                        .merge(mlst_df, on="ID", how="outer")
+
     merged_df[["QC Status", "QC Failed Fields"]] = merged_df.apply(
         lambda row: pd.Series(qc_row(row, args)), axis=1
     )

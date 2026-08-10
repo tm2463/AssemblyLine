@@ -10,6 +10,7 @@ Parameters can be passed via the command line or preferably by editing the 'qc.c
 Required:
     --input                             Path to input manifest (columns: ID, R1, R2)
     --sylph_db                          Path to sylph database (e.g. /path/to/.sylphdb)
+    --sylph_tax_file                    Path to sylph-tax database (e.g. /path/to/gtdb_r232_metadata.tsv.gz)
     --checkm2_db                        Path to checkm2 database (e.g. /path/to/.dmnd)
     --bakta_db                          Path to bakta database (e.g. /path/to/database)
 

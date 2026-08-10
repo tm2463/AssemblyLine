@@ -5,6 +5,9 @@ mkdir databases && cd databases
 # sylph db
 wget http://faust.compbio.cs.cmu.edu/sylph-stuff/gtdb-r232-c1000-dbv1.syldb
 
+# sylph-tax
+wget -O gtdb_r232_metadata.tsv.gz "https://zenodo.org/records/19646381/files/gtdb_r232_metadata.tsv.gz?download=1"
+
 # checkm2 db
 wget https://zenodo.org/records/14897628/files/checkm2_database.tar.gz?download=1
 tar -xvzf "checkm2_database.tar.gz?download=1" && rm checkm2_database.tar.gz?download=1

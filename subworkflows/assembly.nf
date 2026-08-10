@@ -7,6 +7,7 @@ include { UNICYCLER } from '../modules/unicycler.nf'
 include { QUAST } from '../modules/quast.nf'
 include { CHECKM2 } from '../modules/checkm2.nf'
 include { FASTANI } from '../modules/fastani.nf'
+include { MLST } from '../modules/mlst.nf'
 include { COLLECT_REPORTS 
           MERGE_REPORTS } from '../modules/reporting.nf'
 
@@ -34,6 +35,7 @@ workflow ASSEMBLY {
             quast: it
             checkm2: it
             fastani: it
+            mlst: it
         }
         .set { split_ch }
 
@@ -45,10 +47,13 @@ workflow ASSEMBLY {
     checkm2_db = Channel.value(file(params.checkm2_db, checkIfExists: true))
     CHECKM2(split_ch.checkm2, checkm2_db)
 
+    MLST(split_ch.mlst)
+
     report_ch = qc_ch
         .join(QUAST.out.quast_out)
         .join(FASTANI.out.fastani_out)
         .join(CHECKM2.out.checkm2_out)
+        .join(MLST.out.mlst_out)
 
     COLLECT_REPORTS(report_ch)
 

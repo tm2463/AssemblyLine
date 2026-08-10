@@ -2,8 +2,7 @@
 
 include { FASTP 
           FASTPLONG } from '../modules/fastp.nf'
-include { SYLPH_TAX_FILE
-          SYLPH 
+include { SYLPH 
           SYLPH_TAX } from '../modules/sylph.nf'
 include { BWA
           SAMTOOLS 
@@ -44,12 +43,7 @@ workflow PREPROCESSING {
     sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))
     
     SYLPH(sylph_ch, sylph_db_ch)
-    
-    SYLPH_TAX_FILE()
-
-    SYLPH.out.sylph_out
-        .combine(SYLPH_TAX_FILE.out.tax)
-        | SYLPH_TAX
+    | SYLPH_TAX
 
     SYLPH_TAX.out.sylph_tax
         | filter { it -> it[4].trim() == 'PASS' }
