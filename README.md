@@ -2,6 +2,8 @@
 
 AssemblyLine is a best practise bacterial isolate genome assembly pipeline written in Nextflow. It can handle short, long or hybrid read datasets and performs read QC, assembly, assembly QC and annotation.
 
+![Alt text](assets/combined.png)
+
 ## Setup
 
 1. First ensure you have [Nextflow](https://docs.seqera.io/nextflow/install#installation) installed
