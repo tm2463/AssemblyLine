@@ -5,8 +5,6 @@ process MLST {
 
     container "quay.io/biocontainers/mlst:2.35.0--hdfd78af_0"
 
-    publishDir "${params.outdir}/${ID}"
-
     input:
     tuple val(ID), path(contigs)
 
