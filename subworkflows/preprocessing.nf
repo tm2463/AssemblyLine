@@ -1,12 +1,13 @@
 #!/usr/bin/env nextflow
 
-include { FASTP 
-          FASTPLONG } from '../modules/fastp.nf'
 include { SYLPH 
           SYLPH_TAX } from '../modules/sylph.nf'
 include { BWA
           SAMTOOLS 
           FILTER_SAMTOOLS } from '../modules/mapping.nf'
+
+include { SHORT_READ_PREPROCESSING } from './short_read_preprocessing.nf'
+include { LONG_READ_PREPROCESSING } from './long_read_preprocessing.nf'
 
 workflow PREPROCESSING {
 
@@ -14,31 +15,23 @@ workflow PREPROCESSING {
     input_ch
 
     main:
-    def sylph_ch
+    def preprocessed_ch
 
     if (params.mode == 'short') {
-        FASTP(input_ch)
-        sylph_ch = FASTP.out.fastp
+        SHORT_READ_PREPROCESSING(input_ch)
+            .set { preprocessed_ch }
 
     } else if (params.mode == 'long') {
-        FASTPLONG(input_ch)
-        sylph_ch = FASTPLONG.out.fastplong
+        LONG_READ_PREPROCESSING(input_ch)
+            .set { preprocessed_ch }
 
     } else if (params.mode == 'hybrid') {
-        FASTP(input_ch.map { ID, reads, size -> tuple(ID, [reads[0], reads[1]], size) })
-        FASTPLONG(input_ch.map { ID, reads, size -> tuple(ID, [reads[2]], size) })
+        short_reads_ch = input_ch.map { ID, reads, size -> tuple(ID, [reads[0], reads[1]], size) }
+        long_reads_ch = input_ch.map { ID, reads, size -> tuple(ID, [reads[2]], size) }
 
-        sylph_ch = FASTP.out.fastp
-            | join(FASTPLONG.out.fastplong, by: 0)
-            | map { ID, short_reads, size, long_reads, size2 ->
-                tuple(ID, short_reads + long_reads, size)
-            }
+        SHORT_READ_PREPROCESSING(short_reads_ch)
+        LONG_READ_PREPROCESSING(long_reads_ch)
     }
-
-    // FILTER_FASTP(sylph_ch)
-    // | filter { it -> it[3].trim() == 'PASS' }
-    // | map { it -> it[0..2] }
-    // | set { fastp_out_ch }
 
     sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))
     
