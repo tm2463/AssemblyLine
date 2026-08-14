@@ -1,5 +1,2 @@
-Hostile module:
-- Add in channel with predownloaded human T2T assembly (as specified in docs)
-
-Sylph modules:
-- Can no longer use mode to pass reads into sylph, use 'n = reads.size()' logic instead as in HOSTILE
+SHORT and LONG read preprocessing:
+    - if reference is provided, map reads to reference and apply qc pass/fail based on mapping %
