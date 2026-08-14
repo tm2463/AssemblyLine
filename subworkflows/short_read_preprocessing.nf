@@ -4,6 +4,8 @@ include { FASTQC } from '../modules/fastqc.nf'
 include { FASTP 
           FILTER_FASTP } from '../modules/fastp.nf'
 
+include { DECONTAMINATION } from '../subworkflows/decontamination.nf'
+
 workflow SHORT_READ_PREPROCESSING {
 
     take:
@@ -13,11 +15,12 @@ workflow SHORT_READ_PREPROCESSING {
     FASTQC(input_ch)
     
     FASTP(input_ch)
-        | FILTER_FASTP
-        | filter { it -> it[3].trim() == 'PASS' }
-        | map { it -> it[0..2] }
-        | set { fastp_out_ch }
+    | FILTER_FASTP
+    | filter { it -> it[3].trim() == 'PASS' }
+    | map { it -> it[0..2] }
+    | DECONTAMINATION
 
     emit:
-    fastp_out_ch
+    DECONTAMINATION.out
+
 }

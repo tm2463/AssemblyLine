@@ -11,8 +11,7 @@ process FASTP {
     tuple val(ID), path(reads), val(size)
 
     output:
-    tuple val(ID), path("${ID}_{1,2}_fastp.fq.gz"), val(size), emit: fastp
-    path("${ID}.json"), emit: json
+    tuple val(ID), path("${ID}_{1,2}_fastp.fq.gz"), val(size), path("${ID}.json"), emit: fastp
 
     script:
     def R1="${reads[0]}"

@@ -5,9 +5,9 @@ include { printHelp
           setInputChannel 
           validateManifest } from './modules/helper_functions.nf'
 
-include { PREPROCESSING } from './subworkflows/preprocessing.nf'
-include { ASSEMBLY } from './subworkflows/assembly.nf'
-include { ANNOTATION } from './subworkflows/annotation.nf'
+include { PREPROCESSING } from './workflows/preprocessing.nf'
+include { ASSEMBLY } from './workflows/assembly.nf'
+include { ANNOTATION } from './workflows/annotation.nf'
 
 workflow {
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env nextflow
 
 include { HOSTILE } from '../modules/hostile.nf'
+include { SYLPH 
+          SYLPH_TAX } from '../modules/sylph.nf'
 
 workflow DECONTAMINATION {
 
@@ -22,7 +24,12 @@ workflow DECONTAMINATION {
     SYLPH(cleaned_ch, sylph_db_ch)
     | SYLPH_TAX
 
-    emit:
+    SYLPH_TAX.out.sylph_tax
+        | filter { it -> it[4].trim() == 'PASS' }
+        | map { it -> it[0..2] }
+        | set { mapping_ch }
 
+    emit:
+    mapping_ch
 
 }

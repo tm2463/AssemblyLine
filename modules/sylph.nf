@@ -13,24 +13,26 @@ process SYLPH {
     tuple val(ID), path(reads), val(genome_size), path("${ID}_sylph_profile.tsv"), emit: sylph_out
 
     script:
-    """
-    if [[ "${params.mode}" == "short" ]]; then
-        R1="${reads[0]}"
-        R2="${reads[1]}"
-        sylph sketch -t ${task.cpus} -1 \$R1 -2 \$R2 -d ${ID}_sketch
-    elif [[ "${params.mode}" == "long" ]]; then
-        long_fastq="${reads[0]}"
-        sylph sketch -t ${task.cpus} -d ${ID}_sketch \$long_fastq
-    elif [[ "${params.mode}" == "hybrid" ]]; then
-        R1="${reads[0]}"
-        R2="${reads[1]}"
-        long_fastq="${reads[0]}"
-        sylph sketch -t ${task.cpus} -1 \$R1 -2 \$R2 -d ${ID}_sketch
-        sylph sketch -t ${task.cpus} -d ${ID}_sketch \$long_fastq
-    fi
-
-    sylph profile -t ${task.cpus} ${sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv
-    """
+    def n = reads.size()
+    def profile = "sylph profile -t ${task.cpus} ${sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv"
+    if (n == 1) {
+        // long reads only
+        def long_fastq = reads[0]
+        """
+        sylph sketch -t ${task.cpus} -d ${ID}_sketch ${long_fastq}  
+        ${profile}
+        """
+    } else if (n == 2) {
+        // short paired-end only
+        def R1 = reads[0]
+        def R2 = reads[1]
+        """
+        sylph sketch -t ${task.cpus} -1 ${R1} -2 ${R2} -d ${ID}_sketch
+        ${profile}
+        """
+    } else {
+        error "Unexpected number of read files (${n}) for sample ${ID}"
+    }
 }
 
 process SYLPH_TAX {
@@ -53,19 +55,14 @@ process SYLPH_TAX {
 
     script:
     def tax_file = file(params.sylph_tax_file, checkIfExists: true)
-    // Filtering criteria for sylph-tax: sequence abundance > 98% and coverage > min_depth
-    // Short and long mode share the same filtering criteria, while hybrid mode requires a higher sequence abundance threshold of 196%
-    def short_long_filter = "\$2 > 98 && \$3 > 98 && \$5 > ${params.min_depth}"
-    def hybrid_filter = "\$2 > 196 && \$3 > 98 && \$5 > ${params.min_depth}"
-    def selected_filter = params.mode == 'hybrid' ? hybrid_filter : short_long_filter
     """
     sylph-tax taxprof ${sylph_profile} -t ${tax_file} 1>&2
 
     RESULT=\$(awk 'NF' ${ID}*.sylphmpa | tail -n 1 \
-        | awk -F'\t' '${selected_filter} {found=1} END {print (found ? "PASS" : "FAIL")}')
+        | awk -F'\t' '\$2 > 98 {found=1} END {print (found ? "PASS" : "FAIL")}')
 
     if [ "\${RESULT}" == "FAIL" ]; then
-        echo "${ID} failed sylph-tax filter: no row met sequence abundance > 98 or coverage > ${params.min_depth}" > ${ID}.fail
+        echo "${ID} failed sylph-tax filter: final row did not meet sequence abundance threshold (>98)" > ${ID}.fail
     fi
 
     printf '%s' "\${RESULT}"

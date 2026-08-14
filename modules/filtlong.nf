@@ -19,6 +19,6 @@ process FILTLONG {
         --keep_percent 90 \
         --target_bases 500000000 \
         ${long_fastq} \
-        | gzip > ${out_fastq}
+    | gzip > ${out_fastq}
     """
 }

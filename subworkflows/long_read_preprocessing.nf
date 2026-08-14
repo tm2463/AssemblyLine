@@ -4,6 +4,8 @@ include { NANOPLOT } from '../modules/nanoplot.nf'
 include { PORECHOP } from '../modules/porechop.nf'
 include { FILTLONG } from '../modules/filtlong.nf'
 
+include { DECONTAMINATION } from '../subworkflows/decontamination.nf'
+
 workflow LONG_READ_PREPROCESSING {
 
     take:
@@ -11,11 +13,12 @@ workflow LONG_READ_PREPROCESSING {
 
     main:
     NANOPLOT(input_ch)
+
     PORECHOP(input_ch)
     | FILTLONG
-
-    preprocessed_ch = FILTLONG.out.filtlong
+    | DECONTAMINATION
 
     emit:
-    preprocessed_ch
+    DECONTAMINATION.out
+
 }

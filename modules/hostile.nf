@@ -1,6 +1,7 @@
 process HOSTILE {
+    // https://github.com/bede/hostile
     tag "${ID}"
-    label "medium"
+    label args.mode == "short" ? "medium" : "large"
 
     container "quay.io/biocontainers/hostile:2.0.2--pyhdfd78af_0"
 
@@ -31,5 +32,7 @@ process HOSTILE {
             --threads ${task.cpus} \\
             --out-dir . \\
         """
+    } else {
+    error "Unexpected number of read files (${n}) for sample ${ID}"
     }
 }
