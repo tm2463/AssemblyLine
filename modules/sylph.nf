@@ -15,14 +15,7 @@ process SYLPH {
     script:
     def n = reads.size()
     def profile = "sylph profile -t ${task.cpus} ${sylph_db} ${ID}_sketch/*.sylsp > ${ID}_sylph_profile.tsv"
-    if (n == 1) {
-        // long reads only
-        def long_fastq = reads[0]
-        """
-        sylph sketch -t ${task.cpus} -d ${ID}_sketch ${long_fastq}  
-        ${profile}
-        """
-    } else if (n == 2) {
+    if (n == 2) {
         // short paired-end only
         def R1 = reads[0]
         def R2 = reads[1]
@@ -31,7 +24,12 @@ process SYLPH {
         ${profile}
         """
     } else {
-        error "Unexpected number of read files (${n}) for sample ${ID}"
+        // long reads only
+        def long_fastq = reads[0]
+        """
+        sylph sketch -t ${task.cpus} -d ${ID}_sketch ${long_fastq}  
+        ${profile}
+        """
     }
 }
 

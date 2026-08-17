@@ -60,6 +60,6 @@ process FILTER_SAMTOOLS {
     script:
     def command="${projectDir}/bin/parse_samtools.py"
     """
-    ${command} ${ID} ${sn_stats} ${params.min_mapping_rate}
+    ${command} ${ID} ${sn_stats} ${params.min_mapping_rate} ${params.max_error_rate}
     """
 }
