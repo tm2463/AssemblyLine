@@ -21,10 +21,12 @@ workflow ASSEMBLY {
     if (params.mode == "short") {
         SHOVILL(assembly_ch)
         qc_ch = SHOVILL.out
+
     } else if (params.mode == "long") {
         MAKE_UNIQUE_READ_IDS(assembly_ch)
         | DRAGONFLYE
         qc_ch = DRAGONFLYE.out
+        
     } else if (params.mode == "hybrid") {
         UNICYCLER(assembly_ch)
         qc_ch = UNICYCLER.out

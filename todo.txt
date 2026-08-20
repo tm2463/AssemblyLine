@@ -1,8 +1,9 @@
 SHORT and LONG read preprocessing:
     - if reference is provided, map reads to reference and apply qc pass/fail based on mapping %
 
-Mapping:
+Validation:
     - validate mapping error rate < 0.02 parameter in parse_samtools script
+    - validate pass/fail fastqc is working as expected
 
 Database Management:
     - if paths to databases aren't provided, download them to prevent pipeline from failing

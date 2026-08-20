@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-include { FASTQC } from '../modules/fastqc.nf'
+include { FASTQC 
+          FILTER_FASTQC } from '../modules/fastqc.nf'
 include { FASTP 
           FILTER_FASTP } from '../modules/fastp.nf'
 include { BWA
@@ -16,8 +17,15 @@ workflow SHORT_READ_PREPROCESSING {
 
     main:
     FASTQC(input_ch)
+
+    fastqc_pass_criteria = file(params.fastqc_pass_criteria, checkIfExists: true)
     
-    FASTP(input_ch)
+    FILTER_FASTQC(FASTQC.out.zip, fastqc_pass_criteria)
+    | filter { it -> it[3].trim() == 'PASS' }
+    | map { it -> it[0..2] }
+    | set { fastqc_out_ch }
+    
+    FASTP(fastqc_out_ch)
     | FILTER_FASTP
     | filter { it -> it[3].trim() == 'PASS' }
     | map { it -> it[0..2] }
@@ -34,6 +42,7 @@ workflow SHORT_READ_PREPROCESSING {
         | filter { it -> it[3].trim() == 'PASS' }
         | map { it -> it[0..2] }
         | set { short_out_ch }
+        
     } else {
         short_out_ch = DECONTAMINATION.out
     }
