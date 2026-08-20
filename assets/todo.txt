@@ -4,6 +4,8 @@ SHORT and LONG read preprocessing:
 Validation:
     - validate mapping error rate < 0.02 parameter in parse_samtools script
     - validate pass/fail fastqc is working as expected
+    - validate sylph sketch / profile pass/fail is working as expected
+    - --remove_host_reads has not been tested
 
 Database Management:
     - if paths to databases aren't provided, download them to prevent pipeline from failing

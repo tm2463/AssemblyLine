@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
 include { HOSTILE } from '../modules/hostile.nf'
-include { SYLPH 
-          SYLPH_TAX } from '../modules/sylph.nf'
+include { SYLPH_SKETCH 
+          SYLPH_PROFILE } from '../modules/sylph.nf'
 
 workflow DECONTAMINATION {
 
@@ -11,7 +11,6 @@ workflow DECONTAMINATION {
 
     main:
     def cleaned_ch
-
     if (params.remove_host_reads) {
         HOSTILE(preprocessed_ch)
         cleaned_ch = HOSTILE.out
@@ -19,13 +18,12 @@ workflow DECONTAMINATION {
         cleaned_ch = preprocessed_ch
     }
 
+    SYLPH_SKETCH(cleaned_ch)
+
     sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))
-
-    SYLPH(cleaned_ch, sylph_db_ch)
-    | SYLPH_TAX
-
-    SYLPH_TAX.out.sylph_tax
-        | filter { it -> it[4].trim() == 'PASS' }
+    
+    SYLPH_PROFILE(SYLPH_SKETCH.out.sylph_profile, sylph_db_ch)
+        | filter { it -> it[3].trim() == 'PASS' }
         | map { it -> it[0..2] }
         | set { mapping_ch }
 
