@@ -16,6 +16,6 @@ process NANOPLOT {
     script:
     def long_fastq="${reads[0]}"
     """
-    NanoPlot --fastq ${long_fastq} -p ${ID}
+    NanoPlot --fastq ${long_fastq} -p ${ID} --threads ${task.cpus}
     """
 }

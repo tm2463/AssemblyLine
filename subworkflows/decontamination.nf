@@ -10,7 +10,6 @@ workflow DECONTAMINATION {
     preprocessed_ch
 
     main:
-    def cleaned_ch
     if (params.remove_host_reads) {
         HOSTILE(preprocessed_ch)
         cleaned_ch = HOSTILE.out
@@ -23,9 +22,9 @@ workflow DECONTAMINATION {
     sylph_db_ch = Channel.value(file(params.sylph_db, checkIfExists: true))
     
     SYLPH_PROFILE(SYLPH_SKETCH.out.sylph_profile, sylph_db_ch)
-        | filter { it -> it[3].trim() == 'PASS' }
-        | map { it -> it[0..2] }
-        | set { mapping_ch }
+    | filter { it -> it[3].trim() == 'PASS' }
+    | map { it -> it[0..2] }
+    | set { mapping_ch }
 
     emit:
     mapping_ch
